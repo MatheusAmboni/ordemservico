@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordens de Serviço Solicitadas</title>
+    <style>
+        /* (Estilos CSS - mantidos iguais) */
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        button {
+            background-color: #2196f3;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        header {
+            background-color: #ff9800;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 5px solid #2196f3;
+        }
+
+        /* Responsividade da tabela */
+        @media (max-width: 600px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            th {
+                text-align: center;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid #ddd;
+                position: relative;
+                padding-left: 50%;
+            }
+
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 15px;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Ordens de Serviço Solicitadas</h1>
+    </header>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo de Manutenção</th>
+                    <th>Hora da Solicitação</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaOrdens">
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="window.location.href='home.html'">Voltar para a Página Inicial</button>
+    </div>
+
+    <script>
+        function carregarOrdens() {
+            const ordensSolicitadas = JSON.parse(localStorage.getItem('ordensSolicitadas')) || [];
+            const listaOrdens = document.getElementById('listaOrdens');
+            listaOrdens.innerHTML = '';
+
+            ordensSolicitadas.forEach((ordem, index) => {
+                const row = listaOrdens.insertRow();
+                const cell1 = row.insertCell();
+                const cell2 = row.insertCell();
+                const cell3 = row.insertCell();
+
+                cell1.textContent = ordem.tipoManutencao;
+                cell1.setAttribute('data-label', 'Tipo de Manutenção:');
+                cell2.textContent = ordem.dataHora;
+                cell2.setAttribute('data-label', 'Hora da Solicitação:');
+
+                const btnVer = document.createElement('button');
+                btnVer.textContent = 'Detalhes';
+                btnVer.addEventListener('click', () => {
+                    // Exibe os detalhes da OS em um modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: white;
+                        padding: 20px;
+                        border-radius: 5px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        z-index: 1000;
+                    `;
+                    modal.innerHTML = `
+                        <h2>Detalhes da OS</h2>
+                        <p><strong>Tipo de Manutenção:</strong> ${ordem.tipoManutencao}</p>
+                        <p><strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
+                        <p><strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
+                        <p><strong>Setor:</strong> ${ordem.setor}</p>
+                        <p><strong>Descrição:</strong> ${ordem.descricao}</p>
+                        <p><strong>Prioridade:</strong> ${ordem.prioridade}</p>
+                        <button onclick="this.parentNode.remove()">Fechar</button>
+                    `;
+                    document.body.appendChild(modal);
+                });
+                cell3.appendChild(btnVer);
+
+                const btnIniciar = document.createElement('button');
+                btnIniciar.textContent = 'Concluir';
+                btnIniciar.addEventListener('click', () => {
+                    // Salve os dados da ordem de serviço no localStorage 
+                    // para serem acessados na página PAG4 APPOS FAZER.html
+                    localStorage.setItem('ordemSelecionada', JSON.stringify(ordem));
+                    window.location.href = `concluiros.html`;
+                });
+                cell3.appendChild(btnIniciar);
+
+                // Botão Remover
+                const btnRemover = document.createElement('button');
+                btnRemover.textContent = 'Remover';
+                btnRemover.addEventListener('click', () => {
+                    if (confirm('Deseja realmente remover esta OS?')) {
+                        ordensSolicitadas.splice(index, 1);
+                        localStorage.setItem('ordensSolicitadas', JSON.stringify(ordensSolicitadas));
+                        carregarOrdens(); // Recarrega a lista de OSs
+                    }
+                });
+                cell3.appendChild(btnRemover);
+            });
+        }
+
+        carregarOrdens();
+    </script>
+</body>
+
+</html>

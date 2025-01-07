@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordens de Serviço</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        header {
+            background-color: #f0b803;
+            /* Cor de laranja "pôr do sol" */
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            /* Cor azul para os botões */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            /* Cantos arredondados */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Sombra suave */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* Transições suaves */
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            /* Efeito de elevação ao passar o mouse */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            /* Sombra mais intensa */
+        }
+
+        button:active {
+            transform: translateY(1px);
+            /* Efeito de "pressionar" ao clicar */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Sombra reduzida ao clicar */
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Ordens de Serviço</h1>
+    </header>
+
+    <div class="container">
+        <div class="btn-group">
+            <button onclick="window.location.href='solicitaros.html'">Gerar Ordem de Serviço</button>
+            <button onclick="window.location.href='ossolicitadas.html'">Ordens Solicitadas</button>
+            <button onclick="window.location.href='osconcluidas.html'">Ordens Concluídas</button>
+        </div>
+    </div>
+
+</body>
+
+</html>

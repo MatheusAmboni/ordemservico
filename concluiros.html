@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concluir Ordem de Serviço</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header {
+            background-color: #ff9800;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 5px solid #2196f3;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group button {
+            background-color: #2196f3;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 16px;
+            margin: 0 5px;
+            padding: 0;
+        }
+
+        .input-group input {
+            width: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Concluir Ordem de Serviço</h1>
+    </header>
+
+    <div class="container">
+        <form id="formManutencao">
+            <label>Responsáveis:</label>
+            <div class="checkbox-group" id="responsaveisGroup">
+                <label><input type="checkbox" name="responsaveis" value="Cristiano"> Cristiano</label>
+                <label><input type="checkbox" name="responsaveis" value="Edvaldo"> Edvaldo</label>
+                <label><input type="checkbox" name="responsaveis" value="Emerson"> Emerson</label>
+            </div>
+            <label>Materiais Utilizados:</label>
+            <textarea id="MateriaisUtilizados"></textarea>
+            <label for="descricaoTarefa">Descrição da Tarefa:</label>
+            <textarea id="descricaoTarefa"></textarea>
+
+            <label for="dataHoraTermino">Término da tarefa:</label>
+            <input type="text" id="dataHoraTermino" class="flatpickr" readonly>
+
+            <button type="submit">Concluir</button>
+        </form>
+
+        <div id="conclusaoMensagem" style="display: none; margin-top: 20px;">
+            <p>Concluído OS com sucesso!</p>
+        </div>
+        <button onclick="window.location.href='ossolicitadas.html'" style="margin-top: 20px;">Voltar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Inicializando o Flatpickr para o campo de data/hora
+        flatpickr("#dataHoraTermino", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true
+        });
+
+        function pegarValoresFormulario() {
+            const dadosFormulario = {};
+
+            // Responsáveis
+            const responsaveisSelecionados = [];
+            document.querySelectorAll('input[name="responsaveis"]:checked').forEach(checkbox => {
+                responsaveisSelecionados.push(checkbox.value);
+            });
+            dadosFormulario.responsaveis = responsaveisSelecionados;
+
+            // Materiais
+            dadosFormulario.materiais = document.getElementById('MateriaisUtilizados').value;
+
+            // Descrição
+            dadosFormulario.descricao = document.getElementById('descricaoTarefa').value;
+
+            // Data e hora de término
+            dadosFormulario.dataHoraTermino = document.getElementById('dataHoraTermino').value;
+
+            return dadosFormulario;
+        }
+
+        document.getElementById('formManutencao').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const dadosFormulario = pegarValoresFormulario();
+
+            let manutencoes = JSON.parse(localStorage.getItem('ordensConcluidas')) || [];
+
+            manutencoes.push(dadosFormulario);
+
+            localStorage.setItem('ordensConcluidas', JSON.stringify(manutencoes));
+
+            // Remover a OS da lista de ordens solicitadas
+            const ordemSelecionada = JSON.parse(localStorage.getItem('ordemSelecionada'));
+            let ordensSolicitadas = JSON.parse(localStorage.getItem('ordensSolicitadas')) || [];
+            ordensSolicitadas = ordensSolicitadas.filter(ordem => ordem.dataHora !== ordemSelecionada.dataHora);
+            localStorage.setItem('ordensSolicitadas', JSON.stringify(ordensSolicitadas));
+
+            document.getElementById('conclusaoMensagem').style.display = 'block';
+
+            window.location.href = 'ossolicitadas.html';
+
+        });
+
+    </script>
+
+</body>
+
+</html>

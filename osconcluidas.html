@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordens Concluídas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2196f3;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .ordens-lista {
+            margin-top: 20px;
+        }
+
+        .ordem-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .ordem-item:hover {
+            background-color: #e3f2fd;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1976d2;
+        }
+
+        .ordem-detalhes {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .ordem-detalhes table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Estilo melhorado para o botão de remover */
+        .remover-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .remover-btn:hover {
+            background-color: #d32f2f;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .remover-btn:focus {
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Ordens Concluídas</h1>
+    </header>
+
+    <div class="container">
+        <h2>Lista de Ordens Concluídas</h2>
+        <div class="ordens-lista" id="ordensLista">
+            <!-- A lista de ordens será carregada aqui -->
+        </div>
+
+        <div class="ordem-detalhes" id="ordemDetalhes">
+            <h3>Detalhes da Ordem</h3>
+            <table id="detalhesTabela">
+                <!-- Detalhes da ordem serão exibidos aqui -->
+            </table>
+            <button id="detalhesRemover" class="remover-btn">
+                Remover Ordem
+            </button>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='home.html'">Voltar para a Página Inicial</button>
+        </div>
+    </div>
+
+    <script>
+        // Função para carregar e exibir as ordens concluídas
+        function carregarOrdensConcluidas() {
+            const ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas')) || [];
+
+            if (ordensConcluidas.length === 0) {
+                document.getElementById('ordensLista').innerHTML = '<p>Nenhuma ordem concluída encontrada.</p>';
+                return;
+            }
+
+            const listaOrdens = document.getElementById('ordensLista');
+            listaOrdens.innerHTML = '';
+
+            ordensConcluidas.forEach((ordem, index) => {
+                const item = document.createElement('div');
+                item.classList.add('ordem-item');
+                item.innerHTML = `
+                    <strong>Ordem #${index + 1}</strong> - Responsáveis: ${ordem.responsaveis.join(', ')}
+                    <button onclick="mostrarDetalhes(${index})">Ver Detalhes</button>
+                `;
+                listaOrdens.appendChild(item);
+            });
+        }
+
+        // Função para exibir os detalhes de uma ordem
+        function mostrarDetalhes(index) {
+            const ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas'));
+            const ordem = ordensConcluidas[index];
+
+            const tabelaDetalhes = document.getElementById('detalhesTabela');
+            tabelaDetalhes.innerHTML = `
+                <tr><th>Responsáveis</th><td>${ordem.responsaveis.join(', ')}</td></tr>
+                <tr><th>Materiais Utilizados</th><td>${ordem.materiais}</td></tr>
+                <tr><th>Descrição da Tarefa</th><td>${ordem.descricaoTarefa}</td></tr>
+            `;
+
+            // Adicionar botão para remover a ordem
+            const ordemDetalhes = document.getElementById('detalhesRemover');
+            ordemDetalhes.style.display = 'inline-block'; // Exibe o botão
+            ordemDetalhes.onclick = () => removerOrdem(index);
+
+            document.getElementById('ordemDetalhes').style.display = 'block';
+        }
+
+        // Função para remover uma ordem
+        function removerOrdem(index) {
+            let ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas')) || [];
+            ordensConcluidas.splice(index, 1); // Remove a ordem pelo índice
+            localStorage.setItem('ordensConcluidas', JSON.stringify(ordensConcluidas)); // Atualiza o localStorage
+
+            alert('Ordem removida com sucesso!');
+            document.getElementById('ordemDetalhes').style.display = 'none'; // Oculta os detalhes
+            carregarOrdensConcluidas(); // Atualiza a lista
+        }
+
+        // Carregar ordens concluídas ao carregar a página
+        window.onload = carregarOrdensConcluidas;
+    </script>
+
+</body>
+
+</html>
