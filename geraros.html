@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerar Ordem de Serviço</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-database.js"></script>
     <style>
         /* (Estilos CSS - mantidos iguais) */
         body {
@@ -158,6 +163,21 @@
 
         gerarDataHora();
 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
+            authDomain: "ordemservico-932db.firebaseapp.com",
+            databaseURL: "https://ordemservico-932db-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-932db",
+            storageBucket: "ordemservico-932db.firebasestorage.app",
+            messagingSenderId: "45467201855",
+            appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
         flatpickr(".flatpickr", {
             enableTime: true,
             dateFormat: "d/m/Y H:i",
@@ -166,10 +186,7 @@
         document.getElementById('formOS').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            let nextId = parseInt(localStorage.getItem('nextId')) || 1;
-
             // Coleta dos dados do formulário
-            const id = 0;
             const dataHora = document.getElementById('dataHora').value;
             const tipoManutencao = document.getElementById('tipoManutencao').value;
             const equipe = document.getElementById('equipe').value;
@@ -182,7 +199,7 @@
 
             // Cria um objeto para armazenar os dados
             const novaOrdemServico = {
-                id: nextId,
+                id: new Date().getTime(),
                 dataHora: dataHora,
                 tipoManutencao: tipoManutencao,
                 equipe: equipe,
@@ -194,25 +211,21 @@
                 previsaoConclusao: previsaoConclusao
             };
 
-            // Incrementa o ID no localStorage
-            localStorage.setItem('nextId', nextId + 1);
+            // Adiciona ao Firebase (gera um ID único automaticamente)
+            database.ref('ordensServico').push(novaOrdemServico)
+                .then(() => {
+                    // Exibe mensagem de sucesso
+                    document.getElementById('successMessage').style.display = 'block';
 
-            // Obtém as ordens de serviço existentes do localStorage
-            let ordensSolicitadas = JSON.parse(localStorage.getItem('ordensSolicitadas')) || [];
-
-            // Adiciona a nova ordem de serviço ao array
-            ordensSolicitadas.push(novaOrdemServico);
-
-            // Armazena as ordens de serviço atualizadas no localStorage
-            localStorage.setItem('ordensSolicitadas', JSON.stringify(ordensSolicitadas));
-
-            // Redireciona para a próxima página (PAG3)
-            window.location.href = 'ossolicitadas.html';
-
-            // Exibe mensagem de sucesso
-            document.getElementById('successMessage').style.display = 'block';
+                    // Redireciona para a próxima página (PAG3)
+                    window.location.href = 'ossolicitadas.html';
+                })
+                .catch((error) => {
+                    console.error("Erro ao salvar no Firebase: ", error);
+                });
         });
     </script>
+
 </body>
 
 </html>

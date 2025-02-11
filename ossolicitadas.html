@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordens de Serviço Solicitadas</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         /* (Estilos CSS - mantidos iguais) */
         body {
@@ -72,39 +74,6 @@
             margin-bottom: 20px;
             border-bottom: 5px solid #2196f3;
         }
-
-        /* Responsividade da tabela */
-        @media (max-width: 600px) {
-
-            table,
-            thead,
-            tbody,
-            th,
-            td,
-            tr {
-                display: block;
-            }
-
-            th {
-                text-align: center;
-            }
-
-            td {
-                border: none;
-                border-bottom: 1px solid #ddd;
-                position: relative;
-                padding-left: 50%;
-            }
-
-            td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 50%;
-                padding-left: 15px;
-                font-weight: bold;
-            }
-        }
     </style>
 </head>
 
@@ -133,76 +102,98 @@
     </div>
 
     <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
+            authDomain: "ordemservico-932db.firebaseapp.com",
+            databaseURL: "https://ordemservico-932db-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-932db",
+            storageBucket: "ordemservico-932db.firebasestorage.app",
+            messagingSenderId: "45467201855",
+            appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
         function carregarOrdens() {
-            const ordensSolicitadas = JSON.parse(localStorage.getItem('ordensSolicitadas')) || [];
             const listaOrdens = document.getElementById('listaOrdens');
             listaOrdens.innerHTML = '';
 
-            ordensSolicitadas.forEach((ordem, index) => {
-                const row = listaOrdens.insertRow();
-                const cell1 = row.insertCell();
-                const cell2 = row.insertCell();
-                const cell3 = row.insertCell();
+            // Busca as ordens do Firebase
+            database.ref('ordensServico').once('value', (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const ordem = childSnapshot.val();
+                    const ordemId = childSnapshot.key; // Obtém a chave única gerada pelo Firebase
 
-                cell1.textContent = ordem.tipoManutencao;
-                cell1.setAttribute('data-label', 'Tipo de Manutenção:');
-                cell2.textContent = ordem.dataHora;
-                cell2.setAttribute('data-label', 'Hora da Solicitação:');
+                    const row = listaOrdens.insertRow();
+                    const cell1 = row.insertCell();
+                    const cell2 = row.insertCell();
+                    const cell3 = row.insertCell();
 
-                const btnVer = document.createElement('button');
-                btnVer.textContent = 'Detalhes';
-                btnVer.addEventListener('click', () => {
-                    // Exibe os detalhes da OS em um modal
-                    const modal = document.createElement('div');
-                    modal.style.cssText = `
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background-color: white;
-                        padding: 20px;
-                        border-radius: 5px;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        z-index: 1000;
-                    `;
-                    modal.innerHTML = `
-                        <h2>Detalhes da OS</h2>
-                        <p><strong>Tipo de Manutenção:</strong> ${ordem.tipoManutencao}</p>
-                        <p><strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
-                        <p><strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
-                        <p><strong>Setor:</strong> ${ordem.setor}</p>
-                        <p><strong>Descrição:</strong> ${ordem.descricao}</p>
-                        <p><strong>Prioridade:</strong> ${ordem.prioridade}</p>
-                        <button onclick="this.parentNode.remove()">Fechar</button>
-                    `;
-                    document.body.appendChild(modal);
+                    cell1.textContent = ordem.tipoManutencao;
+                    cell2.textContent = ordem.dataHora;
+
+                    // Botão de Detalhes
+                    const btnVer = document.createElement('button');
+                    btnVer.textContent = 'Detalhes';
+                    btnVer.addEventListener('click', () => {
+                        const modal = document.createElement('div');
+                        modal.style.cssText = `
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background-color: white;
+                            padding: 20px;
+                            border-radius: 5px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            z-index: 1000;
+                        `;
+                        modal.innerHTML = `
+                            <h2>Detalhes da OS</h2>
+                            <p><strong>Tipo de Manutenção:</strong> ${ordem.tipoManutencao}</p>
+                            <p><strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
+                            <p><strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
+                            <p><strong>Setor:</strong> ${ordem.setor}</p>
+                            <p><strong>Descrição:</strong> ${ordem.descricao}</p>
+                            <p><strong>Prioridade:</strong> ${ordem.prioridade}</p>
+                            <button onclick="this.parentNode.remove()">Fechar</button>
+                        `;
+                        document.body.appendChild(modal);
+                    });
+                    cell3.appendChild(btnVer);
+
+                    // Botão de Concluir
+                    const btnIniciar = document.createElement('button');
+                    btnIniciar.textContent = 'Concluir';
+                    btnIniciar.addEventListener('click', () => {
+                        localStorage.setItem('ordemSelecionada', JSON.stringify(ordem));
+                        window.location.href = `concluiros.html`;
+                    });
+                    cell3.appendChild(btnIniciar);
+
+                    // Botão de Remover (exclui do Firebase)
+                    const btnRemover = document.createElement('button');
+                    btnRemover.textContent = 'Remover';
+                    btnRemover.addEventListener('click', () => {
+                        if (confirm('Deseja realmente remover esta OS?')) {
+                            database.ref('ordensServico/' + ordemId).remove()
+                                .then(() => {
+                                    carregarOrdens(); // Atualiza a lista após remover
+                                })
+                                .catch((error) => {
+                                    console.error("Erro ao remover OS:", error);
+                                });
+                        }
+                    });
+                    cell3.appendChild(btnRemover);
                 });
-                cell3.appendChild(btnVer);
-
-                const btnIniciar = document.createElement('button');
-                btnIniciar.textContent = 'Concluir';
-                btnIniciar.addEventListener('click', () => {
-                    // Salve os dados da ordem de serviço no localStorage 
-                    // para serem acessados na página PAG4 APPOS FAZER.html
-                    localStorage.setItem('ordemSelecionada', JSON.stringify(ordem));
-                    window.location.href = `concluiros.html`;
-                });
-                cell3.appendChild(btnIniciar);
-
-                // Botão Remover
-                const btnRemover = document.createElement('button');
-                btnRemover.textContent = 'Remover';
-                btnRemover.addEventListener('click', () => {
-                    if (confirm('Deseja realmente remover esta OS?')) {
-                        ordensSolicitadas.splice(index, 1);
-                        localStorage.setItem('ordensSolicitadas', JSON.stringify(ordensSolicitadas));
-                        carregarOrdens(); // Recarrega a lista de OSs
-                    }
-                });
-                cell3.appendChild(btnRemover);
             });
         }
 
+        // Carrega as OSs ao abrir a página
         carregarOrdens();
     </script>
 </body>

@@ -5,115 +5,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordens Concluídas</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         header {
-            background-color: #2196f3;
+            background: linear-gradient(135deg, #2196f3, #1976d2);
             color: white;
             text-align: center;
-            padding: 1rem 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            font-size: 1.5rem;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .container {
-            max-width: 960px;
-            margin: 20px auto;
+            max-width: 600px;
+            width: 90%;
+            background: white;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .ordens-lista {
             margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .ordem-item {
-            background-color: #f9f9f9;
+            background: #e3f2fd;
             padding: 15px;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
         }
 
         .ordem-item:hover {
-            background-color: #e3f2fd;
+            background: #bbdefb;
         }
 
-        .button-group {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        button {
-            background-color: #2196f3;
+        .remover-btn {
+            background: #f44336;
             color: white;
             padding: 10px 20px;
             border: none;
+            border-radius: 20px;
+            font-size: 14px;
             cursor: pointer;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #1976d2;
-        }
-
-        .ordem-detalhes {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .ordem-detalhes table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        /* Estilo melhorado para o botão de remover */
-        .remover-btn {
-            background-color: #f44336;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
         .remover-btn:hover {
-            background-color: #d32f2f;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+            background: #d32f2f;
         }
 
-        .remover-btn:focus {
-            outline: none;
+        .btn-voltar {
+            display: inline-block;
+            margin-top: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background: #388e3c;
         }
     </style>
 </head>
@@ -122,87 +92,62 @@
     <header>
         <h1>Ordens Concluídas</h1>
     </header>
-
     <div class="container">
         <h2>Lista de Ordens Concluídas</h2>
-        <div class="ordens-lista" id="ordensLista">
-            <!-- A lista de ordens será carregada aqui -->
-        </div>
-
-        <div class="ordem-detalhes" id="ordemDetalhes">
-            <h3>Detalhes da Ordem</h3>
-            <table id="detalhesTabela">
-                <!-- Detalhes da ordem serão exibidos aqui -->
-            </table>
-            <button id="detalhesRemover" class="remover-btn">
-                Remover Ordem
-            </button>
-        </div>
-
-        <div class="button-group">
-            <button onclick="window.location.href='index.html'">Voltar para a Página Inicial</button>
-        </div>
+        <div id="ordensLista"></div>
+        <a href="index.html" class="btn-voltar">Voltar para a Página Inicial</a>
     </div>
-
     <script>
-        // Função para carregar e exibir as ordens concluídas
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
+            authDomain: "ordemservico-932db.firebaseapp.com",
+            databaseURL: "https://ordemservico-932db-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-932db",
+            storageBucket: "ordemservico-932db.firebasestorage.app",
+            messagingSenderId: "45467201855",
+            appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         function carregarOrdensConcluidas() {
-            const ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas')) || [];
-
-            if (ordensConcluidas.length === 0) {
-                document.getElementById('ordensLista').innerHTML = '<p>Nenhuma ordem concluída encontrada.</p>';
-                return;
-            }
-
             const listaOrdens = document.getElementById('ordensLista');
             listaOrdens.innerHTML = '';
-
-            ordensConcluidas.forEach((ordem, index) => {
-                const item = document.createElement('div');
-                item.classList.add('ordem-item');
-                item.innerHTML = `
-                    <strong>Ordem #${index + 1}</strong> - Responsáveis: ${ordem.responsaveis.join(', ')}
-                    <button onclick="mostrarDetalhes(${index})">Ver Detalhes</button>
-                `;
-                listaOrdens.appendChild(item);
+            database.ref('ordensServicoConcluidas').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    listaOrdens.innerHTML = '<p>Nenhuma ordem concluída encontrada.</p>';
+                    return;
+                }
+                snapshot.forEach((childSnapshot) => {
+                    const ordem = childSnapshot.val();
+                    const ordemId = childSnapshot.key;
+                    const item = document.createElement('div');
+                    item.classList.add('ordem-item');
+                    item.innerHTML = `
+                        <span><strong>Ordem:</strong> ${ordem.descricao} - <strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</span>
+                        <button onclick="removerOrdem('${ordemId}')" class="remover-btn">Remover</button>
+                    `;
+                    listaOrdens.appendChild(item);
+                });
             });
         }
 
-        // Função para exibir os detalhes de uma ordem
-        function mostrarDetalhes(index) {
-            const ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas'));
-            const ordem = ordensConcluidas[index];
-
-            const tabelaDetalhes = document.getElementById('detalhesTabela');
-            tabelaDetalhes.innerHTML = `
-                <tr><th>Responsáveis</th><td>${ordem.responsaveis.join(', ')}</td></tr>
-                <tr><th>Materiais Utilizados</th><td>${ordem.materiais}</td></tr>
-                <tr><th>Descrição da Tarefa</th><td>${ordem.descricaoTarefa}</td></tr>
-            `;
-
-            // Adicionar botão para remover a ordem
-            const ordemDetalhes = document.getElementById('detalhesRemover');
-            ordemDetalhes.style.display = 'inline-block'; // Exibe o botão
-            ordemDetalhes.onclick = () => removerOrdem(index);
-
-            document.getElementById('ordemDetalhes').style.display = 'block';
+        function removerOrdem(ordemId) {
+            if (confirm('Deseja realmente remover esta ordem concluída?')) {
+                database.ref('ordensServicoConcluidas/' + ordemId).remove()
+                    .then(() => {
+                        carregarOrdensConcluidas();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao remover ordem:", error);
+                    });
+            }
         }
 
-        // Função para remover uma ordem
-        function removerOrdem(index) {
-            let ordensConcluidas = JSON.parse(localStorage.getItem('ordensConcluidas')) || [];
-            ordensConcluidas.splice(index, 1); // Remove a ordem pelo índice
-            localStorage.setItem('ordensConcluidas', JSON.stringify(ordensConcluidas)); // Atualiza o localStorage
-
-            alert('Ordem removida com sucesso!');
-            document.getElementById('ordemDetalhes').style.display = 'none'; // Oculta os detalhes
-            carregarOrdensConcluidas(); // Atualiza a lista
-        }
-
-        // Carregar ordens concluídas ao carregar a página
         window.onload = carregarOrdensConcluidas;
     </script>
-
 </body>
 
 </html>
