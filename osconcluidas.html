@@ -45,7 +45,7 @@
             margin-bottom: 10px;
             border-radius: 8px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: 0.3s;
@@ -55,15 +55,37 @@
             background: #bbdefb;
         }
 
-        .remover-btn {
-            background: #f44336;
+        .detalhes {
+            display: none;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .detalhes-btn {
+            background: #ff9800;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border: none;
             border-radius: 20px;
             font-size: 14px;
             cursor: pointer;
             transition: 0.3s;
+        }
+
+        .detalhes-btn:hover {
+            background: #e68900;
+        }
+
+        .remover-btn {
+            background: #f44336;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
         }
 
         .remover-btn:hover {
@@ -98,7 +120,6 @@
         <a href="index.html" class="btn-voltar">Voltar para a Página Inicial</a>
     </div>
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
             authDomain: "ordemservico-932db.firebaseapp.com",
@@ -126,12 +147,27 @@
                     const item = document.createElement('div');
                     item.classList.add('ordem-item');
                     item.innerHTML = `
-                        <span><strong>Ordem:</strong> ${ordem.descricao} - <strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</span>
-                        <button onclick="removerOrdem('${ordemId}')" class="remover-btn">Remover</button>
+                        <span><strong>Ordem:</strong> ${ordem.descricao}</span>
+                        <button class="detalhes-btn" onclick="toggleDetalhes(this)">Detalhes</button>
+                        <div class="detalhes">
+                            <p><strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</p>
+                            <p><strong>Data:</strong> ${ordem.dataHoraTermino}</p>
+                            <p><strong>Materiais:</strong> ${ordem.materiais}</p>
+                            <button onclick="removerOrdem('${ordemId}')" class="remover-btn">Remover</button>
+                        </div>
                     `;
                     listaOrdens.appendChild(item);
                 });
             });
+        }
+
+        function toggleDetalhes(botao) {
+            const detalhes = botao.nextElementSibling;
+            if (detalhes.style.display === 'none' || detalhes.style.display === '') {
+                detalhes.style.display = 'block';
+            } else {
+                detalhes.style.display = 'none';
+            }
         }
 
         function removerOrdem(ordemId) {
