@@ -7,105 +7,187 @@
     <title>Ordens Concluídas</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f2f5;
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #4CAF50;
+            --accent-color: #FFC107;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-light: #FFFFFF;
+            --text-dark: #212121;
+            --bg-light: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --item-bg: #E8F5E9;
+            --item-hover: #C8E6C9;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
         header {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-light);
             text-align: center;
             width: 100%;
             padding: 1.5rem 0;
-            font-size: 1.5rem;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow);
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             width: 90%;
-            background: white;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
             text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
         }
 
         .ordem-item {
-            background: #e3f2fd;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: 0.3s;
+            background: var(--item-bg);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
         }
 
         .ordem-item:hover {
-            background: #bbdefb;
+            background: var(--item-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .ordem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .ordem-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex-grow: 1;
         }
 
         .detalhes {
             display: none;
-            margin-top: 10px;
-            text-align: left;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
         }
 
-        .detalhes-btn {
-            background: #ff9800;
-            color: white;
-            padding: 8px 15px;
+        .detalhes p {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--secondary-color);
+        }
+
+        .btn {
             border: none;
-            border-radius: 20px;
-            font-size: 14px;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .detalhes-btn:hover {
+        .btn-detalhe {
+            background: var(--accent-color);
+            color: var(--text-light);
+        }
+
+        .btn-detalhe:hover {
             background: #e68900;
         }
 
-        .remover-btn {
-            background: #f44336;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
+        .btn-remover {
+            background: var(--danger-color);
+            color: var(--text-light);
         }
 
-        .remover-btn:hover {
+        .btn-remover:hover {
             background: #d32f2f;
         }
 
         .btn-voltar {
-            display: inline-block;
-            margin-top: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
+            background: var(--success-color);
+            color: var(--text-light);
             text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
+            margin-top: 1.5rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
         }
 
         .btn-voltar:hover {
             background: #388e3c;
+        }
+
+        .acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .sem-ordens {
+            text-align: center;
+            padding: 2rem;
+            color: #757575;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -117,7 +199,9 @@
     <div class="container">
         <h2>Lista de Ordens Concluídas</h2>
         <div id="ordensLista"></div>
-        <a href="index.html" class="btn-voltar">Voltar para a Página Inicial</a>
+        <a href="index.html" class="btn btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar para a Página Inicial
+        </a>
     </div>
     <script>
         const firebaseConfig = {
@@ -138,7 +222,7 @@
             listaOrdens.innerHTML = '';
             database.ref('ordensServicoConcluidas').once('value', (snapshot) => {
                 if (!snapshot.exists()) {
-                    listaOrdens.innerHTML = '<p>Nenhuma ordem concluída encontrada.</p>';
+                    listaOrdens.innerHTML = '<div class="sem-ordens"><i class="fas fa-info-circle"></i> Nenhuma ordem concluída encontrada.</div>';
                     return;
                 }
                 snapshot.forEach((childSnapshot) => {
@@ -147,13 +231,21 @@
                     const item = document.createElement('div');
                     item.classList.add('ordem-item');
                     item.innerHTML = `
-                        <span><strong>Ordem:</strong> ${ordem.descricao}</span>
-                        <button class="detalhes-btn" onclick="toggleDetalhes(this)">Detalhes</button>
+                        <div class="ordem-header">
+                            <div class="ordem-title"><i class="fas fa-check-circle"></i> ${ordem.descricao}</div>
+                        </div>
                         <div class="detalhes">
-                            <p><strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</p>
-                            <p><strong>Data:</strong> ${ordem.dataHoraTermino}</p>
-                            <p><strong>Materiais:</strong> ${ordem.materiais}</p>
-                            <button onclick="removerOrdem('${ordemId}')" class="remover-btn">Remover</button>
+                            <p><i class="fas fa-users"></i> <strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</p>
+                            <p><i class="fas fa-calendar-check"></i> <strong>Data de Conclusão:</strong> ${ordem.dataHoraTermino}</p>
+                            <p><i class="fas fa-tools"></i> <strong>Materiais:</strong> ${ordem.materiais || 'Nenhum material registrado'}</p>
+                        </div>
+                        <div class="acoes">
+                            <button class="btn btn-detalhe" onclick="toggleDetalhes(this)">
+                                <i class="fas fa-info-circle"></i> Detalhes
+                            </button>
+                            <button onclick="removerOrdem('${ordemId}')" class="btn btn-remover">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
                         </div>
                     `;
                     listaOrdens.appendChild(item);
@@ -162,11 +254,15 @@
         }
 
         function toggleDetalhes(botao) {
-            const detalhes = botao.nextElementSibling;
+            const item = botao.closest('.ordem-item');
+            const detalhes = item.querySelector('.detalhes');
+
             if (detalhes.style.display === 'none' || detalhes.style.display === '') {
                 detalhes.style.display = 'block';
+                botao.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
             } else {
                 detalhes.style.display = 'none';
+                botao.innerHTML = '<i class="fas fa-info-circle"></i> Detalhes';
             }
         }
 
