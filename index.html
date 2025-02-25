@@ -4,92 +4,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordens de Serviço</title>
+    <title>Página Inicial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #4CAF50;
+            --accent-color: #FFC107;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-light: #FFFFFF;
+            --text-dark: #212121;
+            --bg-light: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --item-bg: #E8F5E9;
+            --item-hover: #C8E6C9;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
         header {
-            background-color: #f0b803;
-            /* Cor de laranja "pôr do sol" */
-            color: white;
-            padding: 1rem 0;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-light);
             text-align: center;
+            width: 100%;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
         }
 
         .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 0 20px;
+            max-width: 800px;
+            width: 90%;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
         }
 
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
         }
 
-        button {
-            background-color: #007bff;
-            /* Cor azul para os botões */
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
-            /* Cantos arredondados */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            /* Sombra suave */
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            /* Transições suaves */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-light);
+            background: var(--primary-color);
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        button:hover {
+        .btn:hover {
+            background: var(--secondary-color);
             transform: translateY(-3px);
-            /* Efeito de elevação ao passar o mouse */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            /* Sombra mais intensa */
         }
 
-        button:active {
+        .btn:active {
             transform: translateY(1px);
-            /* Efeito de "pressionar" ao clicar */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            /* Sombra reduzida ao clicar */
         }
 
-        /* Responsividade para telas menores */
-        @media (max-width: 768px) {
-            .btn-group {
-                flex-direction: column;
-                align-items: center;
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
             }
 
-            button {
-                width: 100%;
-                margin-bottom: 10px;
+            h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 
 <body>
-
     <header>
-        <h1>Ordens de Serviço</h1>
+        <h1>Página Inicial</h1>
     </header>
-
     <div class="container">
-        <div class="btn-group">
-            <button onclick="window.location.href='geraros.html'">Gerar Ordem de Serviço</button>
-            <button onclick="window.location.href='ossolicitadas.html'">Ordens Solicitadas</button>
-            <button onclick="window.location.href='osconcluidas.html'">Ordens Concluídas</button>
-        </div>
+        <a href="geraros.html" class="btn">
+            <i class="fas fa-plus-circle"></i> Gerar Ordem de Serviço
+        </a>
+        <a href="ossolicitadas.html" class="btn">
+            <i class="fas fa-list"></i> Ordens de Serviço Solicitadas
+        </a>
+        <a href="osconcluidas.html" class="btn">
+            <i class="fas fa-check-circle"></i> Ordens Concluídas
+        </a>
     </div>
-
 </body>
 
 </html>

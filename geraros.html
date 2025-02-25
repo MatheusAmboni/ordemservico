@@ -5,165 +5,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerar Ordem de Serviço</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (Estilos CSS - mantidos iguais) */
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #4CAF50;
+            --accent-color: #FFC107;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-light: #FFFFFF;
+            --text-dark: #212121;
+            --bg-light: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --item-bg: #E8F5E9;
+            --item-hover: #C8E6C9;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-light);
+            text-align: center;
+            width: 100%;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
         }
 
         .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
+            max-width: 800px;
+            width: 90%;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
         }
 
         h1 {
-            text-align: center;
-            color: #333;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
         }
 
         label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         input,
         select,
         textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            border-radius: 3px;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
         }
 
-        button {
-            background-color: #ff9800;
-            color: white;
-            padding: 10px 20px;
+        .btn {
             border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-color);
+            color: var(--text-light);
         }
 
-        button:hover {
-            background-color: #f57c00;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        .btn:hover {
+            background: var(--secondary-color);
         }
 
-        button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .success-message {
-            background-color: #4caf50;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
+        .btn-voltar {
+            background: var(--success-color);
+            color: var(--text-light);
+            text-decoration: none;
+            margin-top: 1.5rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
             text-align: center;
         }
 
-        header {
-            background-color: #f0b803;
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
+        .btn-voltar:hover {
+            background: #388e3c;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
-
     <header>
         <h1>Gerar Ordem de Serviço</h1>
     </header>
-
     <div class="container">
-        <div id="successMessage" class="success-message">Ordem de Serviço enviada com sucesso!</div>
-        <form id="formOS">
-            <label for="dataHora">Data e Hora da Solicitação:</label>
-            <input type="text" id="dataHora" readonly>
-
-            <label for="tipoManutencao">Tipo de Manutenção:</label>
-            <select id="tipoManutencao">
+        <form id="ordemForm">
+            <label for="tipoManutencao">Tipo de Manutenção</label>
+            <select id="tipoManutencao" required>
                 <option value="">Selecione</option>
-                <option value="ELETRICA">Elétrica</option>
-                <option value="MECANICA">Mecânica</option>
-                <option value="PREDIAL">Predial</option>
+                <option value="Preventiva">Preventiva</option>
+                <option value="Corretiva">Corretiva</option>
             </select>
 
-            <label for="equipe">Equipe:</label>
-            <select id="equipe">
+            <label for="tipoServico">Tipo de Serviço</label>
+            <input type="text" id="tipoServico" required>
+
+            <label for="maquina">Máquina/Equipamento</label>
+            <input type="text" id="maquina" required>
+
+            <label for="setor">Setor</label>
+            <input type="text" id="setor" required>
+
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" rows="4" required></textarea>
+
+            <label for="prioridade">Prioridade</label>
+            <select id="prioridade" required>
                 <option value="">Selecione</option>
-                <option value="INTERNA">Interna</option>
-                <option value="TERCEIROS">Terceiros</option>
+                <option value="Baixa">Baixa</option>
+                <option value="Média">Média</option>
+                <option value="Alta">Alta</option>
             </select>
 
-            <label for="tipoServico">Tipo de Serviço:</label>
-            <select id="tipoServico">
-                <option value="">Selecione</option>
-                <option value="PREVENTIVA">Preventiva</option>
-                <option value="CORRETIVA">Corretiva</option>
-                <option value="PREDITIVA">Preditiva</option>
-            </select>
-
-            <label for="maquina">Máquina/Equipamento/Local:</label>
-            <input type="text" id="maquina">
-
-            <label for="setor">Setor:</label>
-            <input type="text" id="setor">
-
-            <label for="descricao">Descrição do Problema:</label>
-            <textarea id="descricao"></textarea>
-
-            <label for="prioridade">Prioridade:</label>
-            <select id="prioridade">
-                <option value="">Selecione</option>
-                <option value="BAIXA">Baixa</option>
-                <option value="MEDIA">Média</option>
-                <option value="ALTA">Alta</option>
-            </select>
-
-            <label for="previsaoConclusao">Previsão de Conclusão:</label>
-            <input type="text" id="previsaoConclusao" class="flatpickr" readonly>
-
-            <button type="submit">Gerar Ordem de Serviço</button>
+            <button type="submit" class="btn">
+                <i class="fas fa-save"></i> Salvar Ordem de Serviço
+            </button>
         </form>
-
-        <button onclick="window.location.href='index.html'" style="margin-top: 20px;">Voltar para a página
-            inicial</button>
-
+        <a href="index.html" class="btn btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar para a Página Inicial
+        </a>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        function gerarDataHora() {
-            const dataHora = new Date().toLocaleString('pt-BR');
-            document.getElementById('dataHora').value = dataHora;
-        }
-
-        gerarDataHora();
-
-
         const firebaseConfig = {
             apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
             authDomain: "ordemservico-932db.firebaseapp.com",
@@ -174,58 +181,32 @@
             appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
         };
 
-        // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();
+        const database = firebase.database();
 
-        flatpickr(".flatpickr", {
-            enableTime: true,
-            dateFormat: "d/m/Y H:i",
-        });
+        document.getElementById('ordemForm').addEventListener('submit', function (e) {
+            e.preventDefault();
 
-        document.getElementById('formOS').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Coleta dos dados do formulário
-            const dataHora = document.getElementById('dataHora').value;
-            const tipoManutencao = document.getElementById('tipoManutencao').value;
-            const equipe = document.getElementById('equipe').value;
-            const tipoServico = document.getElementById('tipoServico').value;
-            const maquina = document.getElementById('maquina').value;
-            const setor = document.getElementById('setor').value;
-            const descricao = document.getElementById('descricao').value;
-            const prioridade = document.getElementById('prioridade').value;
-            const previsaoConclusao = document.getElementById('previsaoConclusao').value;
-
-            // Cria um objeto para armazenar os dados
-            const novaOrdemServico = {
-                id: new Date().getTime(),
-                dataHora: dataHora,
-                tipoManutencao: tipoManutencao,
-                equipe: equipe,
-                tipoServico: tipoServico,
-                maquina: maquina,
-                setor: setor,
-                descricao: descricao,
-                prioridade: prioridade,
-                previsaoConclusao: previsaoConclusao
+            const ordem = {
+                tipoManutencao: document.getElementById('tipoManutencao').value,
+                tipoServico: document.getElementById('tipoServico').value,
+                maquina: document.getElementById('maquina').value,
+                setor: document.getElementById('setor').value,
+                descricao: document.getElementById('descricao').value,
+                prioridade: document.getElementById('prioridade').value,
+                dataHora: new Date().toLocaleString()
             };
 
-            // Adiciona ao Firebase (gera um ID único automaticamente)
-            database.ref('ordensServico').push(novaOrdemServico)
+            database.ref('ordensServico').push(ordem)
                 .then(() => {
-                    // Exibe mensagem de sucesso
-                    document.getElementById('successMessage').style.display = 'block';
-
-                    // Redireciona para a próxima página (PAG3)
-                    window.location.href = 'ossolicitadas.html';
+                    alert('Ordem de Serviço gerada com sucesso!');
+                    document.getElementById('ordemForm').reset();
                 })
                 .catch((error) => {
-                    console.error("Erro ao salvar no Firebase: ", error);
+                    console.error("Erro ao gerar ordem de serviço:", error);
                 });
         });
     </script>
-
 </body>
 
 </html>

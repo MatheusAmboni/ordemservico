@@ -7,102 +7,202 @@
     <title>Ordens de Serviço Solicitadas</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (Estilos CSS - mantidos iguais) */
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #4CAF50;
+            --accent-color: #FFC107;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-light: #FFFFFF;
+            --text-dark: #212121;
+            --bg-light: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --item-bg: #E8F5E9;
+            --item-hover: #C8E6C9;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: sans-serif;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #ff9800;
-            color: white;
-        }
-
-        button {
-            background-color: #2196f3;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border-radius: 5px;
-            margin-right: 5px;
-        }
-
-        button:hover {
-            background-color: #1976d2;
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(1px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
         header {
-            background-color: #ff9800;
-            color: white;
-            padding: 1rem 0;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-light);
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 5px solid #2196f3;
+            width: 100%;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .ordem-item {
+            background: var(--item-bg);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .ordem-item:hover {
+            background: var(--item-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .ordem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .ordem-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex-grow: 1;
+        }
+
+        .detalhes {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+
+        .detalhes p {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid var (--secondary-color);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-detalhe {
+            background: var(--accent-color);
+            color: var(--text-light);
+        }
+
+        .btn-detalhe:hover {
+            background: #e68900;
+        }
+
+        .btn-remover {
+            background: var(--danger-color);
+            color: var(--text-light);
+        }
+
+        .btn-remover:hover {
+            background: #d32f2f;
+        }
+
+        .btn-voltar {
+            background: var(--success-color);
+            color: var(--text-light);
+            text-decoration: none;
+            margin-top: 1.5rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        .btn-voltar:hover {
+            background: #388e3c;
+        }
+
+        .acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .sem-ordens {
+            text-align: center;
+            padding: 2rem;
+            color: #757575;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 
 <body>
-
     <header>
         <h1>Ordens de Serviço Solicitadas</h1>
     </header>
-
     <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Tipo de Manutenção</th>
-                    <th>Hora da Solicitação</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listaOrdens">
-            </tbody>
-        </table>
+        <h2>Lista de Ordens Solicitadas</h2>
+        <div id="ordensLista"></div>
+        <a href="index.html" class="btn btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar para a Página Inicial
+        </a>
     </div>
-
-    <div style="text-align: center; margin-top: 20px;">
-        <button onclick="window.location.href='index.html'">Voltar para a Página Inicial</button>
-    </div>
-
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
             authDomain: "ordemservico-932db.firebaseapp.com",
@@ -113,89 +213,100 @@
             appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
         };
 
-
-        // Inicializa Firebase
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();
+        const database = firebase.database();
 
         function carregarOrdens() {
-            const listaOrdens = document.getElementById('listaOrdens');
+            const listaOrdens = document.getElementById('ordensLista');
             listaOrdens.innerHTML = '';
-
-            // Busca as ordens do Firebase
             database.ref('ordensServico').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    listaOrdens.innerHTML = '<div class="sem-ordens"><i class="fas fa-info-circle"></i> Nenhuma ordem solicitada encontrada.</div>';
+                    return;
+                }
                 snapshot.forEach((childSnapshot) => {
                     const ordem = childSnapshot.val();
-                    const ordemId = childSnapshot.key; // Obtém a chave única gerada pelo Firebase
-
-                    const row = listaOrdens.insertRow();
-                    const cell1 = row.insertCell();
-                    const cell2 = row.insertCell();
-                    const cell3 = row.insertCell();
-
-                    cell1.textContent = ordem.tipoManutencao;
-                    cell2.textContent = ordem.dataHora;
-
-                    // Botão de Detalhes
-                    const btnVer = document.createElement('button');
-                    btnVer.textContent = 'Detalhes';
-                    btnVer.addEventListener('click', () => {
-                        const modal = document.createElement('div');
-                        modal.style.cssText = `
-                            position: fixed;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            background-color: white;
-                            padding: 20px;
-                            border-radius: 5px;
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                            z-index: 1000;
-                        `;
-                        modal.innerHTML = `
-                            <h2>Detalhes da OS</h2>
-                            <p><strong>Tipo de Manutenção:</strong> ${ordem.tipoManutencao}</p>
-                            <p><strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
-                            <p><strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
-                            <p><strong>Setor:</strong> ${ordem.setor}</p>
-                            <p><strong>Descrição:</strong> ${ordem.descricao}</p>
-                            <p><strong>Prioridade:</strong> ${ordem.prioridade}</p>
-                            <button onclick="this.parentNode.remove()">Fechar</button>
-                        `;
-                        document.body.appendChild(modal);
-                    });
-                    cell3.appendChild(btnVer);
-
-                    // Botão de Concluir
-                    const btnIniciar = document.createElement('button');
-                    btnIniciar.textContent = 'Concluir';
-                    btnIniciar.addEventListener('click', () => {
-                        localStorage.setItem('ordemSelecionada', JSON.stringify(ordem));
-                        window.location.href = `concluiros.html`;
-                    });
-                    cell3.appendChild(btnIniciar);
-
-                    // Botão de Remover (exclui do Firebase)
-                    const btnRemover = document.createElement('button');
-                    btnRemover.textContent = 'Remover';
-                    btnRemover.addEventListener('click', () => {
-                        if (confirm('Deseja realmente remover esta OS?')) {
-                            database.ref('ordensServico/' + ordemId).remove()
-                                .then(() => {
-                                    carregarOrdens(); // Atualiza a lista após remover
-                                })
-                                .catch((error) => {
-                                    console.error("Erro ao remover OS:", error);
-                                });
-                        }
-                    });
-                    cell3.appendChild(btnRemover);
+                    const ordemId = childSnapshot.key;
+                    const item = document.createElement('div');
+                    item.classList.add('ordem-item');
+                    item.innerHTML = `
+                        <div class="ordem-header">
+                            <div class="ordem-title"><i class="fas fa-wrench"></i> ${ordem.tipoManutencao}</div>
+                        </div>
+                        <div class="detalhes">
+                            <p><i class="fas fa-clock"></i> <strong>Hora da Solicitação:</strong> ${ordem.dataHora}</p>
+                            <p><i class="fas fa-cogs"></i> <strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
+                            <p><i class="fas fa-industry"></i> <strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
+                            <p><i class="fas fa-building"></i> <strong>Setor:</strong> ${ordem.setor}</p>
+                            <p><i class="fas fa-align-left"></i> <strong>Descrição:</strong> ${ordem.descricao}</p>
+                            <p><i class="fas fa-exclamation-circle"></i> <strong>Prioridade:</strong> ${ordem.prioridade}</p>
+                        </div>
+                        <div class="acoes">
+                            <button class="btn btn-detalhe" onclick="toggleDetalhes(this)">
+                                <i class="fas fa-info-circle"></i> Detalhes
+                            </button>
+                            <button onclick="concluirOrdem('${ordemId}')" class="btn btn-remover">
+                                <i class="fas fa-check"></i> Concluir
+                            </button>
+                            <button onclick="removerOrdem('${ordemId}')" class="btn btn-remover">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
+                        </div>
+                    `;
+                    listaOrdens.appendChild(item);
                 });
             });
         }
 
-        // Carrega as OSs ao abrir a página
-        carregarOrdens();
+
+
+        function toggleDetalhes(botao) {
+            const item = botao.closest('.ordem-item');
+            const detalhes = item.querySelector('.detalhes');
+
+            if (detalhes.style.display === 'none' || detalhes.style.display === '') {
+                detalhes.style.display = 'block';
+                botao.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
+            } else {
+                detalhes.style.display = 'none';
+                botao.innerHTML = '<i class="fas fa-info-circle"></i> Detalhes';
+            }
+        }
+
+        function concluirOrdem(ordemId) {
+            if (confirm('Deseja realmente concluir esta ordem?')) {
+                database.ref('ordensServico/' + ordemId).once('value', (snapshot) => {
+                    const ordem = snapshot.val();
+                    database.ref('ordensServicoConcluidas/' + ordemId).set(ordem)
+                        .then(() => {
+                            database.ref('ordensServico/' + ordemId).remove()
+                                .then(() => {
+                                    carregarOrdens();
+                                })
+                                .catch((error) => {
+                                    console.error("Erro ao remover ordem:", error);
+                                });
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao concluir ordem:", error);
+                        });
+                });
+            }
+        }
+
+        function removerOrdem(ordemId) {
+            if (confirm('Deseja realmente remover esta ordem?')) {
+                database.ref('ordensServico/' + ordemId).remove()
+                    .then(() => {
+                        carregarOrdens();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao remover ordem:", error);
+                    });
+            }
+        }
+
+        window.onload = carregarOrdens;
     </script>
 </body>
 
