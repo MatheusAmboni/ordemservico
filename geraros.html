@@ -138,6 +138,9 @@
     <div class="container">
         <form id="ordemForm">
 
+            <label for="nomeSolicitante">Nome do Solicitante:</label>
+            <input type="text" id="nomeSolicitante" required>
+
             <label for="tipoManutencao">Tipo de Manutenção:</label>
             <select id="tipoManutencao">
                 <option value="ELETRICA" selected>Elétrica</option>
@@ -205,6 +208,8 @@
             e.preventDefault();
 
             const ordem = {
+                id: Date.now(),
+                nomeSolicitante: document.getElementById('nomeSolicitante').value,
                 tipoManutencao: document.getElementById('tipoManutencao').value,
                 tipoServico: document.getElementById('tipoServico').value,
                 maquina: document.getElementById('maquina').value,

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concluir Ordem de Serviço</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header {
+            background-color: #ff9800;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 5px solid #2196f3;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Concluir Ordem de Serviço</h1>
+    </header>
+
+    <div class="container">
+        <form id="formManutencao">
+            <label>Responsáveis:</label>
+            <div class="checkbox-group" id="responsaveisGroup">
+                <label><input type="checkbox" name="responsaveis" value="Cristiano"> Cristiano</label>
+                <label><input type="checkbox" name="responsaveis" value="Edvaldo"> Edvaldo</label>
+                <label><input type="checkbox" name="responsaveis" value="Emerson"> Emerson</label>
+            </div>
+            <label>Materiais Utilizados:</label>
+            <textarea id="MateriaisUtilizados"></textarea>
+            <label for="descricaoTarefa">Descrição da Tarefa:</label>
+            <textarea id="descricaoTarefa"></textarea>
+
+            <label for="dataHoraTermino">Término da tarefa:</label>
+            <input type="text" id="dataHoraTermino" class="flatpickr" readonly>
+
+            <button type="submit">Concluir</button>
+        </form>
+
+        <div id="conclusaoMensagem" style="display: none; margin-top: 20px;">
+            <p>Ordem de serviço concluída com sucesso!</p>
+        </div>
+        <button onclick="window.location.href='ossolicitadas.html'" style="margin-top: 20px;">Voltar</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        function gerarDataHora() {
+            const dataHora = new Date().toLocaleString('pt-BR');
+            document.getElementById('dataHoraTermino').value = dataHora;
+        }
+
+        gerarDataHora();
+
+        // 🔥 Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVX-HYIsoK7nYcRJidsKg8xIu644KkU1g",
+            authDomain: "ordemservico-932db.firebaseapp.com",
+            databaseURL: "https://ordemservico-932db-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-932db",
+            storageBucket: "ordemservico-932db.firebasestorage.app",
+            messagingSenderId: "45467201855",
+            appId: "1:45467201855:web:4d087556b1e0c8e2ad638a"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
+        // Inicializa o calendário
+        flatpickr("#dataHoraTermino", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true
+        });
+
+        document.getElementById('formManutencao').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Coleta os dados do formulário
+            const dadosFormulario = pegarValoresFormulario();
+            const ordemSelecionada = JSON.parse(localStorage.getItem('ordemSelecionada'));
+
+            // Cria um objeto com os dados
+            const dadosManutencao = {
+                id: Date.now(),
+                responsaveis: dadosFormulario.responsaveis,
+                materiais: dadosFormulario.materiais,
+                descricao: dadosFormulario.descricao,
+                dataHoraTermino: dadosFormulario.dataHoraTermino
+            };
+
+            // Salva os dados no Firebase
+            database.ref('ordensServicoConcluidas').push(dadosManutencao)
+                .then(() => {
+                    // Após salvar, remove a ordem de serviço original
+                    database.ref('ordensServico').once('value', (snapshot) => {
+                        snapshot.forEach((childSnapshot) => {
+                            const ordem = childSnapshot.val();
+                            const ordemId = childSnapshot.key; // Obtém a chave única gerada pelo Firebase
+
+                            if (ordem.id === ordemSelecionada) {
+                                database.ref('ordensServico/' + ordemId).remove()
+                                    .then(() => {
+                                        console.log("Ordem de serviço removida com sucesso.");
+                                        window.location.href = 'ossolicitadas.html';
+                                    })
+                                    .catch((error) => {
+                                        console.error("Erro ao remover OS:", error);
+                                    });
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao salvar dados no Firebase:", error);
+                });
+        });
+
+        function pegarValoresFormulario() {
+            const dadosFormulario = {};
+
+            // Responsáveis
+            const responsaveisSelecionados = [];
+            document.querySelectorAll('input[name="responsaveis"]:checked').forEach(checkbox => {
+                responsaveisSelecionados.push(checkbox.value);
+            });
+            dadosFormulario.responsaveis = responsaveisSelecionados;
+
+            // Materiais
+            dadosFormulario.materiais = document.getElementById('MateriaisUtilizados').value;
+
+            // Descrição
+            dadosFormulario.descricao = document.getElementById('descricaoTarefa').value;
+
+            // Data e hora de término
+            dadosFormulario.dataHoraTermino = document.getElementById('dataHoraTermino').value;
+
+            return dadosFormulario;
+        }
+    </script>
+
+</body>
+
+</html>

@@ -226,29 +226,30 @@
                 }
                 snapshot.forEach((childSnapshot) => {
                     const ordem = childSnapshot.val();
-                    const ordemId = childSnapshot.key;
                     const item = document.createElement('div');
+                    const ordemKey = childSnapshot.key;
                     item.classList.add('ordem-item');
                     item.innerHTML = `
                         <div class="ordem-header">
-                            <div class="ordem-title"><i class="fas fa-wrench"></i> ${ordem.tipoManutencao}</div>
+                            <div class="ordem-title"><i class="fas fa-wrench"></i> ${ordem.descricao}</div>
                         </div>
                         <div class="detalhes">
+                            <p><i class="fas fa-user"></i> <strong>Nome do Solicitante:</strong> ${ordem.nomeSolicitante}</p>
                             <p><i class="fas fa-clock"></i> <strong>Hora da Solicitação:</strong> ${ordem.dataHora}</p>
                             <p><i class="fas fa-cogs"></i> <strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
                             <p><i class="fas fa-industry"></i> <strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
                             <p><i class="fas fa-building"></i> <strong>Setor:</strong> ${ordem.setor}</p>
-                            <p><i class="fas fa-align-left"></i> <strong>Descrição:</strong> ${ordem.descricao}</p>
+                            <p><i class="fas fa-align-left"></i> <strong>Equipe:</strong> ${ordem.tipoManutencao}</p>
                             <p><i class="fas fa-exclamation-circle"></i> <strong>Prioridade:</strong> ${ordem.prioridade}</p>
                         </div>
                         <div class="acoes">
                             <button class="btn btn-detalhe" onclick="toggleDetalhes(this)">
                                 <i class="fas fa-info-circle"></i> Detalhes
                             </button>
-                            <button onclick="concluirOrdem('${ordemId}')" class="btn btn-remover">
+                            <button onclick="concluirOrdem('${ordemKey}')" class="btn btn-remover">
                                 <i class="fas fa-check"></i> Concluir
                             </button>
-                            <button onclick="removerOrdem('${ordemId}')" class="btn btn-remover">
+                            <button onclick="removerOrdem('${ordemKey}')" class="btn btn-remover">
                                 <i class="fas fa-trash"></i> Remover
                             </button>
                         </div>
@@ -257,8 +258,6 @@
                 });
             });
         }
-
-
 
         function toggleDetalhes(botao) {
             const item = botao.closest('.ordem-item');
@@ -273,31 +272,16 @@
             }
         }
 
-        function concluirOrdem(ordemId) {
-            if (confirm('Deseja realmente concluir esta ordem?')) {
-                database.ref('ordensServico/' + ordemId).once('value', (snapshot) => {
-                    const ordem = snapshot.val();
-                    database.ref('ordensServicoConcluidas/' + ordemId).set(ordem)
-                        .then(() => {
-                            database.ref('ordensServico/' + ordemId).remove()
-                                .then(() => {
-                                    carregarOrdens();
-                                })
-                                .catch((error) => {
-                                    console.error("Erro ao remover ordem:", error);
-                                });
-                        })
-                        .catch((error) => {
-                            console.error("Erro ao concluir ordem:", error);
-                        });
-                });
-            }
+        function concluirOrdem(ordemKey) {
+            localStorage.setItem('ordemSelecionada', JSON.stringify(ordemKey));
+            window.location.href = `concluiros.html`;
         }
 
-        function removerOrdem(ordemId) {
+        function removerOrdem(ordemKey) {
             if (confirm('Deseja realmente remover esta ordem?')) {
-                database.ref('ordensServico/' + ordemId).remove()
+                database.ref('ordensServico/' + ordemKey).remove()
                     .then(() => {
+                        console.log(ordemKey);
                         carregarOrdens();
                     })
                     .catch((error) => {
