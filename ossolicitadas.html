@@ -236,7 +236,7 @@
                         <div class="detalhes">
                             <p><i class="fas fa-user"></i> <strong>Nome do Solicitante:</strong> ${ordem.nomeSolicitante}</p>
                             <p><i class="fas fa-clock"></i> <strong>Hora da Solicitação:</strong> ${ordem.dataHora}</p>
-                            <p><i class="fas fa-cogs"></i> <strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
+                            <p><i class="fas fa-cogs"></i> <strong>Tipo de Serviço:</strong> ${ordem.equipe}</p>
                             <p><i class="fas fa-industry"></i> <strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
                             <p><i class="fas fa-building"></i> <strong>Setor:</strong> ${ordem.setor}</p>
                             <p><i class="fas fa-align-left"></i> <strong>Equipe:</strong> ${ordem.tipoManutencao}</p>
@@ -245,6 +245,9 @@
                         <div class="acoes">
                             <button class="btn btn-detalhe" onclick="toggleDetalhes(this)">
                                 <i class="fas fa-info-circle"></i> Detalhes
+                            </button>
+                            <button class="btn btn-detalhe" onclick="imprimirPDF(this)">
+                                <i class="fas fa-file-pdf"></i> Imprimir PDF
                             </button>
                             <button onclick="concluirOrdem('${ordemKey}')" class="btn btn-remover">
                                 <i class="fas fa-check"></i> Concluir
@@ -270,6 +273,37 @@
                 detalhes.style.display = 'none';
                 botao.innerHTML = '<i class="fas fa-info-circle"></i> Detalhes';
             }
+        }
+
+        function imprimirPDF(botao) {
+            const item = botao.closest('.ordem-item');
+            const detalhes = item.querySelector('.detalhes');
+
+            if (detalhes.style.display === 'none' || detalhes.style.display === '') {
+                alert('Por favor, exiba os detalhes antes de imprimir.');
+                return;
+            }
+
+            const detalhesHTML = detalhes.innerHTML;
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <html>
+                    <head>
+                        <title>Detalhes da Ordem</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+                            h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+                            p { margin-bottom: 0.5rem; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Detalhes da Ordem</h1>
+                        ${detalhesHTML}
+                    </body>
+                </html>
+            `);
+            janela.document.close();
+            janela.print();
         }
 
         function concluirOrdem(ordemKey) {

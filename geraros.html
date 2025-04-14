@@ -147,15 +147,13 @@
                 <option value="MECANICA">Mecânica</option>
                 <option value="PREDIAL">Outro</option>
             </select>
-
             <label for="equipe">Equipe:</label>
             <select id="equipe">
                 <option value="INTERNA" selected>Interna</option>
                 <option value="TERCEIROS">Terceiros</option>
             </select>
-
-            <label for="tipoServico">Tipo de Serviço</label>
-            <select id="tipoServico">
+            <label for="tipoManutencao">Tipo de Serviço</label>
+            <select id="tipoManutencao">
                 <option value="Corretiva" selected>Corretiva</option>
                 <option value="Preventiva">Preventiva</option>
             </select>
@@ -208,10 +206,9 @@
             e.preventDefault();
 
             const ordem = {
-                id: Date.now(),
                 nomeSolicitante: document.getElementById('nomeSolicitante').value,
+                equipe: document.getElementById('equipe').value,
                 tipoManutencao: document.getElementById('tipoManutencao').value,
-                tipoServico: document.getElementById('tipoServico').value,
                 maquina: document.getElementById('maquina').value,
                 setor: document.getElementById('setor').value,
                 descricao: document.getElementById('descricao').value,

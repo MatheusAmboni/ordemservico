@@ -158,6 +158,8 @@
             const dadosFormulario = pegarValoresFormulario();
             const ordemSelecionada = JSON.parse(localStorage.getItem('ordemSelecionada'));
 
+            
+
             // Cria um objeto com os dados
             const dadosManutencao = {
                 id: Date.now(),
@@ -176,7 +178,7 @@
                             const ordem = childSnapshot.val();
                             const ordemId = childSnapshot.key; // Obtém a chave única gerada pelo Firebase
 
-                            if (ordem.id === ordemSelecionada) {
+                            if (ordem.id === ordemSelecionada.id) {
                                 database.ref('ordensServico/' + ordemId).remove()
                                     .then(() => {
                                         console.log("Ordem de serviço removida com sucesso.");
@@ -193,7 +195,6 @@
                     console.error("Erro ao salvar dados no Firebase:", error);
                 });
         });
-
         function pegarValoresFormulario() {
             const dadosFormulario = {};
 
