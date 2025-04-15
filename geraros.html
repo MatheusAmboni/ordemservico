@@ -210,6 +210,12 @@
         document.getElementById('ordemForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
+            const descricao = document.getElementById('descricao').value.trim();
+            if (!descricao) {
+                alert('Por favor, preencha o campo "Descrição do problema".');
+                return;
+            }
+
             // Retrieve and increment the counter
             const counterRef = database.ref('ordensServicoCounter');
             counterRef.transaction((currentValue) => {
@@ -225,7 +231,7 @@
                     tipoServico: document.getElementById('tipoServico').value,
                     maquina: document.getElementById('maquina').value,
                     setor: document.getElementById('setor').value,
-                    descricao: `#${ordemNumber} - ${document.getElementById('descricao').value}`, // Include the number in the description
+                    descricao: `#${ordemNumber} - ${descricao}`, // Include the number in the description
                     prioridade: document.getElementById('prioridade').value,
                     dataHora: new Date().toLocaleString(),
                     previsaoConclusao: document.getElementById('previsaoConclusao').value,

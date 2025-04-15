@@ -4,203 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordens Concluídas</title>
+    <title>Ordens de Serviço Concluídas</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <!-- Font Awesome para ícones -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2E7D32;
-            --secondary-color: #4CAF50;
-            --accent-color: #FFC107;
-            --danger-color: #D32F2F;
-            --success-color: #388E3C;
-            --text-light: #FFFFFF;
-            --text-dark: #212121;
-            --bg-light: #F1F8E9;
-            --card-bg: #FFFFFF;
-            --item-bg: #E8F5E9;
-            --item-hover: #C8E6C9;
-            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        * {
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
         }
 
         header {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            color: var(--text-light);
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
             text-align: center;
-            width: 100%;
-            padding: 1.5rem 0;
-            box-shadow: var(--shadow);
         }
 
         .container {
             max-width: 800px;
-            width: 90%;
             margin: 2rem auto;
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            font-size: 1.8rem;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
             text-align: center;
-            border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 0.5rem;
+            color: #4CAF50;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+            text-decoration: none;
+            color: white;
+            background-color: #4CAF50;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-voltar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
         }
 
         .ordem-item {
-            background: var(--item-bg);
-            padding: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             margin-bottom: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .ordem-item:hover {
-            background: var(--item-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            background-color: #f9f9f9;
         }
 
         .ordem-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 0.5rem;
         }
 
         .ordem-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            flex-grow: 1;
-        }
-
-        .detalhes {
-            display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
         }
 
         .detalhes p {
-            margin-bottom: 0.5rem;
-            padding-left: 0.5rem;
-            border-left: 2px solid var(--secondary-color);
-        }
-
-        .btn {
-            border: none;
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
             font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-detalhe {
-            background: var(--accent-color);
-            color: var(--text-light);
-        }
-
-        .btn-detalhe:hover {
-            background: #e68900;
-        }
-
-        .btn-remover {
-            background: var(--danger-color);
-            color: var(--text-light);
-        }
-
-        .btn-remover:hover {
-            background: #d32f2f;
-        }
-
-        .btn-voltar {
-            background: var(--success-color);
-            color: var(--text-light);
-            text-decoration: none;
-            margin-top: 1.5rem;
-            display: block;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-        }
-
-        .btn-voltar:hover {
-            background: #388e3c;
-        }
-
-        .acoes {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-            margin-top: 1rem;
         }
 
         .sem-ordens {
             text-align: center;
-            padding: 2rem;
-            color: #757575;
+            color: #999;
             font-style: italic;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                width: 95%;
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
+        .acoes {
+            margin-top: 1rem;
+            text-align: right;
         }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>Ordens Concluídas</h1>
+        <h1>Ordens de Serviço Concluídas</h1>
     </header>
     <div class="container">
         <h2>Lista de Ordens Concluídas</h2>
-        <div id="ordensLista"></div>
+        <div id="ordensConcluidasLista"></div>
         <a href="index.html" class="btn btn-voltar">
-            <i class="fas fa-arrow-left"></i> Voltar para a Página Inicial
+            <i class="fas fa-arrow-left"></i> Voltar para Página inicial
         </a>
     </div>
     <script>
@@ -218,33 +126,38 @@
         const database = firebase.database();
 
         function carregarOrdensConcluidas() {
-            const listaOrdens = document.getElementById('ordensLista');
+            const listaOrdens = document.getElementById('ordensConcluidasLista');
             listaOrdens.innerHTML = '';
-            database.ref('ordensServicoConcluidas').once('value', (snapshot) => {
+            database.ref('ordensConcluidas').once('value', (snapshot) => {
                 if (!snapshot.exists()) {
                     listaOrdens.innerHTML = '<div class="sem-ordens"><i class="fas fa-info-circle"></i> Nenhuma ordem concluída encontrada.</div>';
                     return;
                 }
                 snapshot.forEach((childSnapshot) => {
                     const ordem = childSnapshot.val();
-                    const ordemId = childSnapshot.key;
                     const item = document.createElement('div');
+                    const ordemKey = childSnapshot.key;
                     item.classList.add('ordem-item');
                     item.innerHTML = `
                         <div class="ordem-header">
                             <div class="ordem-title"><i class="fas fa-check-circle"></i> ${ordem.descricao}</div>
                         </div>
                         <div class="detalhes">
-                            <p><i class="fas fa-users"></i> <strong>Responsáveis:</strong> ${ordem.responsaveis || 'N/A'}</p>
-                            <p><i class="fas fa-calendar-check"></i> <strong>Data de Conclusão:</strong> ${ordem.dataHoraTermino}</p>
-                            <p><i class="fas fa-tools"></i> <strong>Materiais:</strong> ${ordem.materiais || 'Nenhum material registrado'}</p>
+                            <p><i class="fas fa-calendar-check"></i> <strong>ID da Ordem:</strong> ${ordemKey}</p>
+                            <p><i class="fas fa-user"></i> <strong>Nome do Solicitante:</strong> ${ordem.nomeSolicitante}</p>
+                            <p><i class="fas fa-align-left"></i> <strong>Tipo de manutenção:</strong> ${ordem.tipoManutencao}</p>
+                            <p><i class="fas fa-cogs"></i> <strong>Equipe:</strong> ${ordem.equipe}</p>
+                            <p><i class="fas fa-tools"></i> <strong>Tipo de Serviço:</strong> ${ordem.tipoServico}</p>
+                            <p><i class="fas fa-desktop"></i> <strong>Máquina/Equipamento:</strong> ${ordem.maquina}</p>
+                            <p><i class="fas fa-building"></i> <strong>Setor:</strong> ${ordem.setor}</p>
+                            <p><i class="fas fa-exclamation-triangle"></i> <strong>Descrição do Problema:</strong> ${ordem.descricao}</p>
+                            <p><i class="fas fa-exclamation-circle"></i> <strong>Prioridade:</strong> ${ordem.prioridade}</p>
+                            <p><i class="fas fa-calendar-alt"></i> <strong>Data/Hora:</strong> ${ordem.dataHora}</p>
+                            <p><i class="fas fa-calendar-alt"></i> <strong>Previsão Conclusão:</strong> ${ordem.previsaoConclusao}</p>   
                         </div>
                         <div class="acoes">
-                            <button class="btn btn-detalhe" onclick="toggleDetalhes(this)">
-                                <i class="fas fa-info-circle"></i> Detalhes
-                            </button>
-                            <button onclick="removerOrdem('${ordemId}')" class="btn btn-remover">
-                                <i class="fas fa-trash"></i> Remover
+                            <button class="btn btn-detalhe" onclick="imprimirPDF(this)">
+                                <i class="fas fa-file-pdf"></i> Imprimir PDF
                             </button>
                         </div>
                     `;
@@ -253,29 +166,35 @@
             });
         }
 
-        function toggleDetalhes(botao) {
+        function imprimirPDF(botao) {
             const item = botao.closest('.ordem-item');
             const detalhes = item.querySelector('.detalhes');
 
-            if (detalhes.style.display === 'none' || detalhes.style.display === '') {
-                detalhes.style.display = 'block';
-                botao.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
-            } else {
-                detalhes.style.display = 'none';
-                botao.innerHTML = '<i class="fas fa-info-circle"></i> Detalhes';
+            if (!detalhes || detalhes.innerHTML.trim() === '') {
+                alert('Não há detalhes disponíveis para imprimir.');
+                return;
             }
-        }
 
-        function removerOrdem(ordemId) {
-            if (confirm('Deseja realmente remover esta ordem concluída?')) {
-                database.ref('ordensServicoConcluidas/' + ordemId).remove()
-                    .then(() => {
-                        carregarOrdensConcluidas();
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao remover ordem:", error);
-                    });
-            }
+            const detalhesHTML = detalhes.innerHTML;
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <html>
+                    <head>
+                        <title>Detalhes da Ordem</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+                            h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+                            p { margin-bottom: 0.5rem; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Detalhes da Ordem</h1>
+                        ${detalhesHTML}
+                    </body>
+                </html>
+            `);
+            janela.document.close();
+            janela.print();
         }
 
         window.onload = carregarOrdensConcluidas;

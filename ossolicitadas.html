@@ -311,8 +311,26 @@
         }
 
         function concluirOrdem(ordemKey) {
-            localStorage.setItem('ordemSelecionada', JSON.stringify(ordemKey));
-            window.location.href = `concluiros.html`;
+            database.ref('ordensServico/' + ordemKey).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const ordem = snapshot.val();
+                    // Add the order to the "ordensConcluidas" list
+                    database.ref('ordensConcluidas/' + ordemKey).set(ordem)
+                        .then(() => {
+                            // Remove the order from the "ordensServico" list
+                            database.ref('ordensServico/' + ordemKey).remove()
+                                .then(() => {
+                                    carregarOrdens();
+                                })
+                                .catch((error) => {
+                                    console.error("Erro ao remover ordem:", error);
+                                });
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao concluir ordem:", error);
+                        });
+                }
+            });
         }
 
         function removerOrdem(ordemKey) {
