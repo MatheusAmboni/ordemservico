@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS/APR - Ordem de Serviço / Análise Preliminar de Riscos</title>
+    <style>
+        /* Estilos CSS permanecem os mesmos da versão anterior */
+        :root {
+            --cor-laranja-principal: #FF8C00;
+            --cor-laranja-secundario: #FFA500;
+            --cor-laranja-hover: #e67e00;
+            --cor-verde: #2E8B57;
+            --cor-verde-hover: #256d44;
+            --cor-azul-info: #5bc0de;
+            --cor-azul-info-hover: #31b0d5;
+            --cor-vermelho-remover: #d9534f;
+            --cor-vermelho-remover-hover: #c9302c;
+            --cor-texto: #333333;
+            --cor-fundo: #f9f9f9;
+            --cor-branco: #FFFFFF;
+            --cor-borda: #ddd;
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 1rem auto;
+            background-color: var(--cor-branco);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--cor-laranja-principal);
+        }
+
+        /* Logo */
+        .logo-container {
+            position: relative;
+            width: 220px;
+            height: 130px;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-empresa-os {
+            display: block;
+            max-width: 180px;
+            max-height: 90px;
+            width: auto;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Nome da classe mantido como no código fornecido */
+        .logo-frame {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border: 3px solid var(--cor-laranja-principal);
+            z-index: 1;
+            border-radius: 5px;
+            animation: neon-oscillate 4s linear infinite;
+        }
+
+        @keyframes neon-oscillate {
+
+            0%,
+            100% {
+                border-color: var(--cor-laranja-secundario);
+                box-shadow: 0 0 5px var(--cor-laranja-secundario), 0 0 10px var(--cor-laranja-secundario), 0 0 15px var(--cor-laranja-principal), inset 0 0 5px var(--cor-laranja-secundario);
+            }
+
+            50% {
+                border-color: var(--cor-verde);
+                box-shadow: 0 0 5px var(--cor-verde), 0 0 10px var(--cor-verde), 0 0 15px var(--cor-verde-hover), inset 0 0 5px var(--cor-verde);
+            }
+        }
+
+        /* Cabeçalhos e Títulos */
+        h1,
+        h2,
+        h3 {
+            color: var(--cor-laranja-principal);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2.5rem;
+            border-top: 2px solid var(--cor-laranja-secundario);
+            padding-top: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            text-align: left;
+            color: var(--cor-texto);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        input[type="number"],
+        input[type="time"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--cor-laranja-secundario);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Nomes */
+        .input-salvar-nome-grupo {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-salvar-nome-grupo input[type="text"] {
+            flex-grow: 1;
+        }
+
+        .input-salvar-nome-grupo button {
+            padding: 0.8rem 0.9rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--cor-azul-info);
+            color: var(--cor-branco);
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-salvar-nome-grupo button:hover {
+            background-color: var(--cor-azul-info-hover);
+        }
+
+        .feedback-nome-salvo {
+            font-size: 0.8rem;
+            color: var(--cor-verde);
+            height: 1em;
+            margin-top: 0.2rem;
+        }
+
+        /* Itens (EPI/EPC/etc.) */
+        .item-management-container {
+            border: 1px solid var(--cor-borda);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: #fff;
+        }
+
+        .input-salvar-item-grupo {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .input-salvar-item-grupo input[type="text"] {
+            flex-grow: 1;
+        }
+
+        .input-salvar-item-grupo button {
+            padding: 0.8rem 0.9rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--cor-azul-info);
+            color: var(--cor-branco);
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-salvar-item-grupo button:hover {
+            background-color: var(--cor-azul-info-hover);
+        }
+
+        .item-add-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .item-add-section .form-group {
+            margin-bottom: 0;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .item-add-section button {
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--cor-verde);
+            color: var(--cor-branco);
+            transition: background-color 0.3s ease;
+            height: fit-content;
+        }
+
+        .item-add-section button:hover {
+            background-color: var(--cor-verde-hover);
+        }
+
+        .lista-itens-selecionados {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 1rem;
+        }
+
+        .lista-itens-selecionados li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: #f9f9f9;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .lista-itens-selecionados li>span {
+            flex-grow: 1;
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+
+        .quantidade-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantidade-controls button {
+            padding: 0.2rem 0.5rem;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid var(--cor-borda);
+            border-radius: 3px;
+            background-color: #fff;
+            color: var(--cor-texto);
+        }
+
+        .quantidade-controls button:hover {
+            background-color: #eee;
+        }
+
+        .quantidade-controls input[type="number"] {
+            width: 50px;
+            padding: 0.3rem;
+            text-align: center;
+            font-size: 0.9rem;
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+
+        .quantidade-controls input[type="number"]::-webkit-outer-spin-button,
+        .quantidade-controls input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .lista-itens-selecionados button.remover-item {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 3px;
+            background-color: var(--cor-vermelho-remover);
+            color: var(--cor-branco);
+            margin-left: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .lista-itens-selecionados button.remover-item:hover {
+            background-color: var(--cor-vermelho-remover-hover);
+        }
+
+        /* Checklists e Radios */
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-group label,
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"],
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checklist-item-yn {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .checklist-item-yn span {
+            font-weight: 600;
+        }
+
+        .checklist-item-yn .radio-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .checklist-item-yn label {
+            font-weight: normal;
+        }
+
+        /* Botões */
+        .botao-salvar-os {
+            background-color: var(--cor-laranja-principal);
+            color: var(--cor-branco);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: block;
+            width: fit-content;
+            margin: 3rem auto 0 auto;
+            font-weight: bold;
+        }
+
+        .botao-salvar-os:hover {
+            background-color: var(--cor-laranja-hover);
+            transform: translateY(-2px);
+        }
+
+        .botao-voltar {
+            background-color: var(--cor-verde);
+            color: var(--cor-branco);
+            border: none;
+            padding: 0.7rem 1.3rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .botao-voltar:hover {
+            background-color: var(--cor-verde-hover);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+                margin-top: 2rem;
+                padding-top: 1rem;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .input-salvar-nome-grupo,
+            .input-salvar-item-grupo {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .input-salvar-nome-grupo input[type="text"],
+            .input-salvar-item-grupo input[type="text"] {
+                margin-bottom: 0.5rem;
+            }
+
+            .item-add-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .item-add-section .form-group {
+                min-width: unset;
+            }
+
+            .lista-itens-selecionados li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quantidade-controls {
+                margin-top: 0.5rem;
+            }
+
+            .lista-itens-selecionados button.remover-item {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .radio-group,
+            .checkbox-group,
+            .checklist-item-yn {
+                gap: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .checklist-item-yn .radio-options {
+                flex-direction: row;
+            }
+
+            .logo-container {
+                width: 180px;
+                height: 110px;
+                margin-bottom: 1.5rem;
+            }
+
+            .logo-empresa-os {
+                max-width: 150px;
+                max-height: 75px;
+            }
+
+            .logo-frame {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-frame"></div>
+            <img src="logo.webp" alt="Logo da Empresa" class="logo-empresa-os">
+        </div>
+        <h1>OS/APR - Ordem de Serviço / Análise Preliminar de Riscos</h1>
+        <a href="menu.html" class="botao-voltar">Voltar ao Menu</a>
+
+        <form id="os-form">
+            <input type="hidden" id="solicitacao-id-ref" name="solicitacao-id-ref">
+
+            <h2>Informações Gerais</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="tipo-os">Tipo de OS:</label>
+                    <select id="tipo-os" name="tipo-os">
+                        <option value="">-- Selecione --</option>
+                        <option value="Corretiva">Corretiva</option>
+                        <option value="Preditiva">Preditiva</option>
+                        <option value="Preventiva">Preventiva</option>
+                        <option value="Melhoria">Melhoria</option>
+                        <option value="Inspeção">Inspeção</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="area-manutencao">Área da Manutenção:</label>
+                    <select id="area-manutencao" name="area-manutencao">
+                        <option value="">-- Selecione --</option>
+                        <option value="Elétrica">Elétrica</option>
+                        <option value="Mecânica">Mecânica</option>
+                        <option value="Predial">Predial</option>
+                        <option value="Instrumentação">Instrumentação</option>
+                        <option value="Utilidades">Utilidades</option>
+                        <option value="Outra">Outra</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="localizacao">Localização / Equipamento:</label>
+                    <input type="text" id="localizacao" name="localizacao"
+                        placeholder="Ex: Painel Elétrico Sala X, Motor Y">
+                </div>
+                <div class="form-group">
+                    <label for="data-emissao">Data e Horário da Emissão:</label>
+                    <input type="datetime-local" id="data-emissao" name="data-emissao" readonly>
+                </div>
+                <div class="form-group full-width">
+                    <label for="descricao-servico">Descrição do Serviço / Problema:</label>
+                    <textarea id="descricao-servico" name="descricao-servico"
+                        placeholder="Descreva detalhadamente o serviço a ser realizado ou o problema encontrado..."></textarea>
+                </div>
+            </div>
+
+            <h2>Equipe Envolvida</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="solicitante-select">Solicitante:</label>
+                    <div class="input-salvar-nome-grupo">
+                        <input type="text" id="solicitante-novo" placeholder="Digitar nome">
+                        <button type="button" onclick="salvarNovoNomeOS('solicitante-novo')">Salvar Nome</button>
+                    </div>
+                    <div class="feedback-nome-salvo" id="feedback-solicitante-novo"></div>
+                    <select id="solicitante-select" name="solicitante">
+                        <option value="">-- Selecione um nome --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Executante(s):</label>
+                    <div>
+                        <label for="executante1-select" style="font-weight:normal; margin-bottom: 0.3rem;">Executante
+                            1:</label>
+                        <div class="input-salvar-nome-grupo"> <input type="text" id="executante1-novo"
+                                placeholder="Digitar nome"> <button type="button"
+                                onclick="salvarNovoNomeOS('executante1-novo')">Salvar Nome</button> </div>
+                        <div class="feedback-nome-salvo" id="feedback-executante1-novo"></div>
+                        <select id="executante1-select" name="executante1">
+                            <option value="">-- Selecione um nome --</option>
+                        </select>
+                    </div>
+                    <div style="margin-top:1rem;">
+                        <label for="executante2-select" style="font-weight:normal; margin-bottom: 0.3rem;">Executante 2
+                            (Opcional):</label>
+                        <div class="input-salvar-nome-grupo"> <input type="text" id="executante2-novo"
+                                placeholder="Digitar nome"> <button type="button"
+                                onclick="salvarNovoNomeOS('executante2-novo')">Salvar Nome</button> </div>
+                        <div class="feedback-nome-salvo" id="feedback-executante2-novo"></div>
+                        <select id="executante2-select" name="executante2">
+                            <option value="">-- Selecione um nome --</option>
+                        </select>
+                    </div>
+                    <div style="margin-top:1rem;">
+                        <label for="executante3-select" style="font-weight:normal; margin-bottom: 0.3rem;">Executante 3
+                            (Opcional):</label>
+                        <div class="input-salvar-nome-grupo"> <input type="text" id="executante3-novo"
+                                placeholder="Digitar nome"> <button type="button"
+                                onclick="salvarNovoNomeOS('executante3-novo')">Salvar Nome</button> </div>
+                        <div class="feedback-nome-salvo" id="feedback-executante3-novo"></div>
+                        <select id="executante3-select" name="executante3">
+                            <option value="">-- Selecione um nome --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Segurança / APR</h2>
+            <div class="form-grid">
+                <div class="form-group checklist-item-yn">
+                    <span>Trabalho a Quente?</span>
+                    <div class="radio-options"> <label><input type="radio" name="trabalho-quente" value="Sim">
+                            Sim</label> <label><input type="radio" name="trabalho-quente" value="Não"> Não</label>
+                        <label><input type="radio" name="trabalho-quente" value="NA"> N/A</label>
+                    </div>
+                </div>
+                <div class="form-group checklist-item-yn">
+                    <span>APR Necessária?</span>
+                    <div class="radio-options"> <label><input type="radio" name="apr-necessaria" value="Sim">
+                            Sim</label> <label><input type="radio" name="apr-necessaria" value="Não"> Não</label>
+                        <label><input type="radio" name="apr-necessaria" value="NA"> N/A</label>
+                    </div>
+                </div>
+                <div class="form-group checklist-item-yn">
+                    <span>Inspeção de Segurança Prévia Realizada?</span>
+                    <div class="radio-options"> <label><input type="radio" name="inspecao-previa" value="Sim">
+                            Sim</label> <label><input type="radio" name="inspecao-previa" value="Não"> Não</label>
+                        <label><input type="radio" name="inspecao-previa" value="NA"> N/A</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label>Riscos da Atividade (Marque os aplicáveis):</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="riscos" value="Trabalho a Quente (Corte/Solda)"> Trabalho a
+                        Quente (Corte/Solda)</label>
+                    <label><input type="checkbox" name="riscos" value="Altura"> Altura</label>
+                    <label><input type="checkbox" name="riscos" value="Espaço Confinado"> Espaço Confinado</label>
+                    <label><input type="checkbox" name="riscos" value="Riscos Elétricos"> Riscos Elétricos</label>
+                    <label><input type="checkbox" name="riscos" value="Produtos Químicos"> Produtos Químicos</label>
+                    <label><input type="checkbox" name="riscos" value="Pintura"> Pintura</label>
+                    <label><input type="checkbox" name="riscos" value="Ruído Elevado"> Ruído Elevado</label>
+                    <label><input type="checkbox" name="riscos" value="Poeira/Fumos"> Poeira/Fumos</label>
+                    <label><input type="checkbox" name="riscos" value="Carga Suspensa"> Carga Suspensa</label>
+                    <label><input type="checkbox" name="riscos" value="Outros"> Outros (Descrever abaixo)</label>
+                </div>
+                <textarea name="riscos-outros-desc" placeholder="Descreva outros riscos, se marcado acima..."
+                    style="margin-top: 0.8rem; font-size: 0.9rem;"></textarea>
+            </div>
+
+
+            <h2>Recursos Necessários / Utilizados</h2>
+            <div class="form-group full-width item-management-container">
+                <h3>EPIs</h3>
+                <div class="input-salvar-item-grupo"> <input type="text" id="epi-novo"
+                        placeholder="Digitar novo EPI para salvar na lista"> <button type="button"
+                        onclick="salvarNovoItemOS('epi-novo', 'episCadastrados', 'epi-select')">Salvar EPI</button>
+                </div>
+                <div class="feedback-nome-salvo" id="feedback-epi-novo"></div>
+                <div class="item-add-section">
+                    <div class="form-group"> <label for="epi-select">Selecionar EPI:</label> <select id="epi-select">
+                            <option value="">-- Escolha um EPI da lista --</option>
+                        </select> </div> <button type="button"
+                        onclick="adicionarItemSelecionado('epi-select', 'lista-epis-selecionados', 'epis')">Adicionar
+                        EPI à OS</button>
+                </div>
+                <ul class="lista-itens-selecionados" id="lista-epis-selecionados"></ul>
+            </div>
+            <div class="form-group full-width item-management-container">
+                <h3>EPCs</h3>
+                <div class="input-salvar-item-grupo"> <input type="text" id="epc-novo"
+                        placeholder="Digitar novo EPC para salvar na lista"> <button type="button"
+                        onclick="salvarNovoItemOS('epc-novo', 'epcsCadastrados', 'epc-select')">Salvar EPC</button>
+                </div>
+                <div class="feedback-nome-salvo" id="feedback-epc-novo"></div>
+                <div class="item-add-section">
+                    <div class="form-group"> <label for="epc-select">Selecionar EPC:</label> <select id="epc-select">
+                            <option value="">-- Escolha um EPC da lista --</option>
+                        </select> </div> <button type="button"
+                        onclick="adicionarItemSelecionado('epc-select', 'lista-epcs-selecionados', 'epcs')">Adicionar
+                        EPC à OS</button>
+                </div>
+                <ul class="lista-itens-selecionados" id="lista-epcs-selecionados"></ul>
+            </div>
+            <div class="form-group full-width item-management-container">
+                <h3>Ferramentas</h3>
+                <div class="input-salvar-item-grupo"> <input type="text" id="ferramenta-novo"
+                        placeholder="Digitar nova ferramenta"> <button type="button"
+                        onclick="salvarNovoItemOS('ferramenta-novo', 'ferramentasCadastradas', 'ferramenta-select')">Salvar
+                        Ferramenta</button> </div>
+                <div class="feedback-nome-salvo" id="feedback-ferramenta-novo"></div>
+                <div class="item-add-section">
+                    <div class="form-group"> <label for="ferramenta-select">Selecionar Ferramenta:</label> <select
+                            id="ferramenta-select">
+                            <option value="">-- Escolha uma ferramenta --</option>
+                        </select> </div> <button type="button"
+                        onclick="adicionarItemSelecionado('ferramenta-select', 'lista-ferramentas-selecionados', 'ferramentas')">Adicionar
+                        Ferramenta à OS</button>
+                </div>
+                <ul class="lista-itens-selecionados" id="lista-ferramentas-selecionados"></ul>
+            </div>
+            <div class="form-group full-width item-management-container">
+                <h3>Materiais Utilizados</h3>
+                <div class="input-salvar-item-grupo"> <input type="text" id="material-novo"
+                        placeholder="Digitar novo material"> <button type="button"
+                        onclick="salvarNovoItemOS('material-novo', 'materiaisCadastrados', 'material-select')">Salvar
+                        Material</button> </div>
+                <div class="feedback-nome-salvo" id="feedback-material-novo"></div>
+                <div class="item-add-section">
+                    <div class="form-group"> <label for="material-select">Selecionar Material:</label> <select
+                            id="material-select">
+                            <option value="">-- Escolha um material --</option>
+                        </select> </div> <button type="button"
+                        onclick="adicionarItemSelecionado('material-select', 'lista-materiais-selecionados', 'materiais')">Adicionar
+                        Material à OS</button>
+                </div>
+                <ul class="lista-itens-selecionados" id="lista-materiais-selecionados"></ul>
+            </div>
+
+            <h2>Observações / Conclusão</h2>
+            <div class="form-group full-width">
+                <label for="observacoes">Observações Adicionais / Detalhes da Execução:</label>
+                <textarea id="observacoes" name="observacoes"
+                    placeholder="Descreva como o serviço foi executado, dificuldades, pontos de atenção, etc..."></textarea>
+            </div>
+
+            <button type="submit" class="botao-salvar-os">Salvar OS/APR</button>
+        </form>
+    </div>
+
+    <script>
+        // --- Constantes Globais ---
+        const STORAGE_KEY_NOMES_OS = 'nomesCadastradosOS';
+        const STORAGE_KEY_EPIS = 'episCadastrados';
+        const STORAGE_KEY_EPCS = 'epcsCadastrados';
+        const STORAGE_KEY_FERRAMENTAS = 'ferramentasCadastradas';
+        const STORAGE_KEY_MATERIAIS = 'materiaisCadastrados';
+        const STORAGE_KEY_OS_SOLICITADAS = 'osSolicitadas'; // Para buscar dados da solicitação
+        const STORAGE_KEY_OS_CONCLUIDAS = 'osConcluidas';   // Onde a OS final será salva
+        const STORAGE_KEY_OS_COUNTER = 'osCounter';
+
+        // --- Funções de Feedback ---
+        function mostrarFeedback(feedbackId, mensagem) { /* ... inalterada ... */
+            const feedbackElement = document.getElementById(feedbackId); if (feedbackElement) { feedbackElement.textContent = mensagem; setTimeout(() => { feedbackElement.textContent = ''; }, 2500); }
+        }
+
+        // --- Funções de Gerenciamento de Nomes (Pessoal) ---
+        function salvarNovoNomeOS(inputId) { /* ... inalterada ... */
+            const inputElement = document.getElementById(inputId); const nome = inputElement.value.trim(); const feedbackId = `feedback-${inputId}`; if (!nome) { mostrarFeedback(feedbackId, 'Digite um nome.'); return; } let nomes = JSON.parse(localStorage.getItem(STORAGE_KEY_NOMES_OS) || '[]'); if (nomes.some(n => n.toLowerCase() === nome.toLowerCase())) { mostrarFeedback(feedbackId, `"${nome}" já existe.`); inputElement.value = ''; return; } nomes.push(nome); localStorage.setItem(STORAGE_KEY_NOMES_OS, JSON.stringify(nomes)); inputElement.value = ''; atualizarTodosSelectsNomesOS(); mostrarFeedback(feedbackId, `"${nome}" salvo!`);
+        }
+        function atualizarTodosSelectsNomesOS() { /* ... inalterada ... */
+            let nomes = JSON.parse(localStorage.getItem(STORAGE_KEY_NOMES_OS) || '[]'); nomes.sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })); const todosOsSelectsNomes = document.querySelectorAll('#solicitante-select, #executante1-select, #executante2-select, #executante3-select'); todosOsSelectsNomes.forEach(select => { const valorSelecionadoAntes = select.value; while (select.options.length > 1) { select.remove(1); } nomes.forEach(nome => { const option = document.createElement('option'); option.value = nome; option.textContent = nome; select.appendChild(option); }); select.value = valorSelecionadoAntes; if (select.value !== valorSelecionadoAntes && valorSelecionadoAntes !== "") { select.value = ""; } });
+        }
+
+        // --- Funções de Gerenciamento de Itens (EPI/EPC/Etc.) ---
+        function salvarNovoItemOS(inputId, storageKey, selectId) { /* ... inalterada ... */
+            const inputElement = document.getElementById(inputId); const itemNome = inputElement.value.trim(); const feedbackId = `feedback-${inputId}`; if (!itemNome) { mostrarFeedback(feedbackId, 'Digite o nome do item.'); return; } let itens = JSON.parse(localStorage.getItem(storageKey) || '[]'); if (itens.some(i => i.toLowerCase() === itemNome.toLowerCase())) { mostrarFeedback(feedbackId, `"${itemNome}" já existe.`); inputElement.value = ''; return; } itens.push(itemNome); localStorage.setItem(storageKey, JSON.stringify(itens)); inputElement.value = ''; atualizarSelectItens(storageKey, selectId); mostrarFeedback(feedbackId, `"${itemNome}" salvo na lista geral!`);
+        }
+        function atualizarSelectItens(storageKey, selectId) { /* ... inalterada ... */
+            const selectElement = document.getElementById(selectId); if (!selectElement) return; let itens = JSON.parse(localStorage.getItem(storageKey) || '[]'); itens.sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })); const valorSelecionadoAntes = selectElement.value; while (selectElement.options.length > 1) { selectElement.remove(1); } itens.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; selectElement.appendChild(option); }); selectElement.value = valorSelecionadoAntes; if (selectElement.value !== valorSelecionadoAntes && valorSelecionadoAntes !== "") { selectElement.value = ""; }
+        }
+        function atualizarTodosSelectsItens() { /* ... inalterada ... */
+            atualizarSelectItens(STORAGE_KEY_EPIS, 'epi-select'); atualizarSelectItens(STORAGE_KEY_EPCS, 'epc-select'); atualizarSelectItens(STORAGE_KEY_FERRAMENTAS, 'ferramenta-select'); atualizarSelectItens(STORAGE_KEY_MATERIAIS, 'material-select');
+        }
+        function adicionarItemSelecionado(selectId, listaVisuaId, tipoItemHidden) { /* ... inalterada ... */
+            const selectElement = document.getElementById(selectId); const listaVisualElement = document.getElementById(listaVisuaId); const itemName = selectElement.value; if (!itemName) { alert('Selecione um item.'); return; } const jaExiste = listaVisualElement.querySelector(`li[data-item-name="${itemName}"]`); if (jaExiste) { alert(`"${itemName}" já adicionado.`); selectElement.value = ''; return; } const listItem = document.createElement('li'); listItem.setAttribute('data-item-name', itemName); listItem.setAttribute('data-item-type', tipoItemHidden); listItem.innerHTML = `<span>${itemName}</span><div class="quantidade-controls"><button type="button" onclick="ajustarQuantidade(this, -1)">-</button><input type="number" value="1" min="1" onchange="validarQuantidade(this)"><button type="button" onclick="ajustarQuantidade(this, 1)">+</button></div><button type="button" class="remover-item" onclick="removerItem(this)">Remover</button>`; listaVisualElement.appendChild(listItem); selectElement.value = '';
+        }
+        function removerItem(buttonElement) { /* ... inalterada ... */
+            const listItem = buttonElement.closest('li'); listItem.remove();
+        }
+        function ajustarQuantidade(buttonElement, delta) { /* ... inalterada ... */
+            const controlsDiv = buttonElement.closest('.quantidade-controls'); const inputQtd = controlsDiv.querySelector('input[type="number"]'); let quantidadeAtual = parseInt(inputQtd.value) || 0; let novaQuantidade = quantidadeAtual + delta; if (novaQuantidade < 1) { novaQuantidade = 1; } inputQtd.value = novaQuantidade;
+        }
+        function validarQuantidade(inputElement) { /* ... inalterada ... */
+            let quantidade = parseInt(inputElement.value); if (isNaN(quantidade) || quantidade < 1) { inputElement.value = 1; }
+        }
+        function getItensSelecionados() { /* ... inalterada ... */
+            const itens = { epis: [], epcs: [], ferramentas: [], materiais: [] }; const listas = document.querySelectorAll('.lista-itens-selecionados li'); listas.forEach(li => { const nome = li.getAttribute('data-item-name'); const tipo = li.getAttribute('data-item-type'); const inputQtd = li.querySelector('input[type="number"]'); const quantidade = parseInt(inputQtd.value) || 1; if (nome && tipo && itens.hasOwnProperty(tipo)) { itens[tipo].push({ nome: nome, quantidade: quantidade }); } }); return itens;
+        }
+
+        // --- Funções Auxiliares e de Inicialização ---
+        function setDataHoraAtualOS() { /* ... inalterada ... */
+            const agora = new Date(); agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset()); document.getElementById('data-emissao').value = agora.toISOString().slice(0, 16);
+        }
+
+        /** >>> NOVO: Busca e pré-preenche dados da solicitação original <<< */
+        function preencherDadosSolicitacao(solicitacaoId) {
+            if (!solicitacaoId) return; // Sai se não houver ID
+
+            console.log("Tentando preencher dados para Solicitação ID:", solicitacaoId);
+            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS) || '[]');
+            // Encontra a solicitação pelo ID
+            const solicitacao = osSolicitadas.find(s => s['id-solicitacao'] === solicitacaoId);
+
+            if (solicitacao) {
+                console.log("Solicitação encontrada:", solicitacao);
+                // Preenche os campos do formulário da OS com os dados da solicitação
+                document.getElementById('solicitacao-id-ref').value = solicitacaoId; // Guarda a referência
+                document.getElementById('descricao-servico').value = solicitacao['descricao-solicitacao'] || '';
+                document.getElementById('area-manutencao').value = solicitacao['area-manutencao'] || '';
+
+                // Tenta pré-selecionar o solicitante (pode não existir mais na lista)
+                const solicitanteSelect = document.getElementById('solicitante-select');
+                if (solicitacao['solicitante'] && Array.from(solicitanteSelect.options).some(opt => opt.value === solicitacao['solicitante'])) {
+                    solicitanteSelect.value = solicitacao['solicitante'];
+                } else if (solicitacao['solicitante']) {
+                    console.warn(`Solicitante "${solicitacao['solicitante']}" da solicitação não encontrado na lista atual.`);
+                    // Opcional: adicionar à lista se não existir? (pode ser complexo)
+                }
+
+                // Adiciona um aviso ou informação visual que esta OS veio de uma solicitação
+                const h1Elem = document.querySelector('h1');
+                if (h1Elem) {
+                    h1Elem.insertAdjacentHTML('afterend', `<p style="text-align: center; font-style: italic; color: var(--cor-verde);">Esta OS foi iniciada a partir da Solicitação: ${solicitacaoId}</p>`);
+                }
+
+                // Outros campos poderiam ser pré-preenchidos se existissem na solicitação (localização, etc.)
+
+            } else {
+                console.warn("Solicitação com ID", solicitacaoId, "não encontrada no localStorage.");
+            }
+        }
+
+        /** >>> NOVO: Lê parâmetros da URL <<< */
+        function lerParametrosURL() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const solicitacaoId = urlParams.get('solicitacaoId'); // Pega o valor do parâmetro 'solicitacaoId'
+            return solicitacaoId; // Retorna o ID encontrado (ou null)
+        }
+
+        // --- Lógica de Salvamento da OS ---
+        document.getElementById('os-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const osData = {};
+
+            formData.forEach((value, key) => {
+                if (key === 'riscos') { if (!osData[key]) { osData[key] = []; } osData[key].push(value); }
+                else { osData[key] = value; }
+            });
+
+            // Adiciona os itens selecionados (EPIs, etc.)
+            const itensColetados = getItensSelecionados();
+            osData['epis_selecionados'] = itensColetados.epis;
+            osData['epcs_selecionados'] = itensColetados.epcs;
+            osData['ferramentas_selecionadas'] = itensColetados.ferramentas;
+            osData['materiais_selecionados'] = itensColetados.materiais;
+
+            // Define data/hora de término
+            const agoraTermino = new Date();
+            agoraTermino.setMinutes(agoraTermino.getMinutes() - agoraTermino.getTimezoneOffset());
+            osData['data-termino'] = agoraTermino.toISOString();
+
+            // Gera número da OS
+            let osCounter = parseInt(localStorage.getItem(STORAGE_KEY_OS_COUNTER) || '0');
+            osCounter++;
+            osData['numero-os'] = `OS-${String(osCounter).padStart(5, '0')}`;
+            localStorage.setItem(STORAGE_KEY_OS_COUNTER, String(osCounter));
+
+            // Salva a OS Concluída
+            let osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS) || '[]');
+            osConcluidas.push(osData);
+            localStorage.setItem(STORAGE_KEY_OS_CONCLUIDAS, JSON.stringify(osConcluidas));
+
+            // >>> NOVO: Opcional - Remover a solicitação original da lista de solicitadas <<<
+            // const solicitacaoIdOriginal = osData['solicitacao-id-ref'];
+            // if (solicitacaoIdOriginal) {
+            //     let osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS) || '[]');
+            //     osSolicitadas = osSolicitadas.filter(s => s['id-solicitacao'] !== solicitacaoIdOriginal);
+            //     localStorage.setItem(STORAGE_KEY_OS_SOLICITADAS, JSON.stringify(osSolicitadas));
+            //     console.log(`Solicitação ${solicitacaoIdOriginal} removida da lista de pendentes.`);
+            // }
+            // Comentei a remoção acima, pois pode ser útil manter o histórico. Descomente se quiser remover.
+
+
+            alert(`OS ${osData['numero-os']} salva com sucesso!`);
+            window.location.href = 'osok.html';
+        });
+
+        // --- Inicialização da Página ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setDataHoraAtualOS();
+            atualizarTodosSelectsNomesOS();
+            atualizarTodosSelectsItens();
+
+            // >>> NOVO: Ler ID da solicitação da URL e preencher dados <<<
+            const solicitacaoId = lerParametrosURL();
+            if (solicitacaoId) {
+                preencherDadosSolicitacao(solicitacaoId);
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

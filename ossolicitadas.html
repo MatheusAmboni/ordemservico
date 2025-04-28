@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS Solicitadas</title>
+    <style>
+        /* Estilos base (cores, container, etc.) - similares aos outros arquivos */
+        :root {
+            --cor-laranja-principal: #FF8C00;
+            --cor-laranja-secundario: #FFA500;
+            --cor-laranja-hover: #e67e00;
+            --cor-verde: #2E8B57;
+            --cor-verde-hover: #256d44;
+            --cor-azul-info: #5bc0de;
+            --cor-azul-info-hover: #31b0d5;
+            --cor-azul-imprimir: #4682B4;
+            /* SteelBlue */
+            --cor-azul-imprimir-hover: #3a6a91;
+            --cor-compartilhar: #0275d8;
+            /* Azul Bootstrap Primary */
+            --cor-compartilhar-hover: #025aa5;
+            --cor-fazer: #5cb85c;
+            /* Verde Sucesso Bootstrap */
+            --cor-fazer-hover: #4cae4c;
+            --cor-texto: #333333;
+            --cor-fundo: #f9f9f9;
+            --cor-branco: #FFFFFF;
+            --cor-borda: #ddd;
+            /* Cores de Prioridade */
+            --cor-prioridade-baixa: #2E8B57;
+            /* Verde */
+            --cor-prioridade-media: #FFD700;
+            /* Amarelo Ouro */
+            --cor-prioridade-alta: #DC143C;
+            /* Vermelho Crimson */
+            --cor-prioridade-urgencia: #000000;
+            /* Preto */
+            --cor-prioridade-texto: #FFFFFF;
+            /* Texto branco para boa leitura */
+            --cor-prioridade-media-texto: #333;
+            /* Texto escuro para amarelo */
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 1rem auto;
+            background-color: var(--cor-branco);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--cor-laranja-principal);
+        }
+
+        /* Logo */
+        .logo-container {
+            position: relative;
+            width: 220px;
+            height: 130px;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-imagem {
+            display: block;
+            max-width: 180px;
+            max-height: 90px;
+            width: auto;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-frame {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border: 3px solid var(--cor-laranja-principal);
+            z-index: 1;
+            border-radius: 5px;
+            animation: neon-oscillate 4s linear infinite;
+        }
+
+        @keyframes neon-oscillate {
+
+            0%,
+            100% {
+                border-color: var(--cor-laranja-secundario);
+                box-shadow: 0 0 5px var(--cor-laranja-secundario), 0 0 10px var(--cor-laranja-secundario), 0 0 15px var(--cor-laranja-principal), inset 0 0 5px var(--cor-laranja-secundario);
+            }
+
+            50% {
+                border-color: var(--cor-verde);
+                box-shadow: 0 0 5px var(--cor-verde), 0 0 10px var(--cor-verde), 0 0 15px var(--cor-verde-hover), inset 0 0 5px var(--cor-verde);
+            }
+        }
+
+        h1 {
+            color: var(--cor-laranja-principal);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 0;
+        }
+
+        /* Botões de Navegação no Topo */
+        .botoes-topo {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .botao-menu,
+        .botao-nova-solicitacao {
+            border: none;
+            padding: 0.8rem 1.4rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            color: var(--cor-branco);
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .botao-menu {
+            background-color: var(--cor-verde);
+        }
+
+        .botao-nova-solicitacao {
+            background-color: var(--cor-azul-info);
+        }
+
+        .botao-menu:hover {
+            background-color: var(--cor-verde-hover);
+            transform: translateY(-2px);
+        }
+
+        .botao-nova-solicitacao:hover {
+            background-color: var(--cor-azul-info-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Tabela de Solicitações */
+        .tabela-solicitacoes-container {
+            overflow-x: auto;
+        }
+
+        .tabela-solicitacoes {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .tabela-solicitacoes th,
+        .tabela-solicitacoes td {
+            border: 1px solid var(--cor-borda);
+            padding: 0.9rem;
+            text-align: left;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .tabela-solicitacoes th {
+            background-color: var(--cor-laranja-secundario);
+            color: var(--cor-branco);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tabela-solicitacoes tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .tabela-solicitacoes tr:hover {
+            background-color: #fff3e0;
+        }
+
+        /* Estilo Célula Prioridade */
+        .tabela-solicitacoes td.prioridade-cell {
+            text-align: center;
+            font-weight: bold;
+            color: var(--cor-prioridade-texto);
+        }
+
+        .prioridade-baixa {
+            background-color: var(--cor-prioridade-baixa);
+        }
+
+        .prioridade-media {
+            background-color: var(--cor-prioridade-media);
+            color: var(--cor-prioridade-media-texto);
+        }
+
+        .prioridade-alta {
+            background-color: var(--cor-prioridade-alta);
+        }
+
+        .prioridade-urgencia {
+            background-color: var(--cor-prioridade-urgencia);
+        }
+
+        /* Botões de Ação na Tabela */
+        .tabela-solicitacoes td .acoes button {
+            color: var(--cor-branco);
+            border: none;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.4rem;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-bottom: 0.3rem;
+        }
+
+        .tabela-solicitacoes td .acoes button.ver {
+            background-color: var(--cor-laranja-principal);
+        }
+
+        .tabela-solicitacoes td .acoes button.ver:hover {
+            background-color: var(--cor-laranja-hover);
+        }
+
+        /* Botão Fazer */
+        .tabela-solicitacoes td .acoes button.fazer {
+            background-color: var(--cor-fazer);
+        }
+
+        .tabela-solicitacoes td .acoes button.fazer:hover {
+            background-color: var(--cor-fazer-hover);
+        }
+
+        /* --- */
+        .tabela-solicitacoes td .acoes button.imprimir {
+            background-color: var(--cor-azul-imprimir);
+        }
+
+        .tabela-solicitacoes td .acoes button.imprimir:hover {
+            background-color: var(--cor-azul-imprimir-hover);
+        }
+
+        .tabela-solicitacoes td .acoes button.compartilhar {
+            background-color: var(--cor-compartilhar);
+        }
+
+        .tabela-solicitacoes td .acoes button.compartilhar:hover {
+            background-color: var(--cor-compartilhar-hover);
+        }
+
+        /* Modal (similar ao osok.html) */
+        #detalhes-solicitacao-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        #detalhes-solicitacao-content {
+            background-color: var(--cor-branco);
+            margin: 5% auto;
+            padding: 25px 30px;
+            border: 1px solid #888;
+            width: 85%;
+            max-width: 700px;
+            border-radius: 8px;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-top: 5px solid var(--cor-laranja-principal);
+        }
+
+        #fechar-modal-solicitacao {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        #fechar-modal-solicitacao:hover,
+        #fechar-modal-solicitacao:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #detalhes-solicitacao-texto h2 {
+            font-size: 1.6rem;
+            color: var(--cor-laranja-principal);
+            text-align: center;
+            border: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        #detalhes-solicitacao-texto p {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        #detalhes-solicitacao-texto strong {
+            color: var(--cor-texto);
+            font-weight: 600;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .container {
+                padding: 1rem 1.5rem;
+            }
+
+            .tabela-solicitacoes th,
+            .tabela-solicitacoes td {
+                font-size: 0.9rem;
+                padding: 0.7rem;
+            }
+
+            .tabela-solicitacoes td .acoes button {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.7rem;
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0.4rem;
+                margin-right: 0;
+            }
+
+            .botoes-topo {
+                justify-content: center;
+            }
+
+            #detalhes-solicitacao-content {
+                width: 92%;
+                margin: 8% auto;
+                padding: 20px;
+            }
+
+            #detalhes-solicitacao-texto h2 {
+                font-size: 1.4rem;
+            }
+
+            #detalhes-solicitacao-texto p {
+                font-size: 0.9rem;
+            }
+
+            .logo-container {
+                width: 180px;
+                height: 110px;
+                margin-bottom: 1.5rem;
+            }
+
+            .logo-imagem {
+                max-width: 150px;
+                max-height: 75px;
+            }
+
+            .logo-frame {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-frame"></div>
+            <img src="logo.webp" alt="Logo da Empresa" class="logo-imagem">
+        </div>
+        <h1>Ordens de Serviço Solicitadas</h1>
+
+        <div class="botoes-topo">
+            <a href="menu.html" class="botao-menu">Voltar ao Menu</a>
+            <a href="solicitaros.html" class="botao-nova-solicitacao">Nova Solicitação</a>
+        </div>
+
+        <div class="tabela-solicitacoes-container">
+            <table class="tabela-solicitacoes" id="tabela-os-solicitadas">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Solicitante</th>
+                        <th>Data Solicitação</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Carregando Solicitações...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detalhes-solicitacao-modal">
+        <div id="detalhes-solicitacao-content">
+            <span id="fechar-modal-solicitacao" onclick="fecharModalSolicitacao()">&times;</span>
+            <div id="detalhes-solicitacao-texto">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modalSolic = document.getElementById('detalhes-solicitacao-modal');
+        const modalContentSolic = document.getElementById('detalhes-solicitacao-texto');
+        const STORAGE_KEY_OS_SOLICITADAS_VIEW = 'osSolicitadas';
+
+        function fecharModalSolicitacao() {
+            modalSolic.style.display = "none";
+            modalContentSolic.innerHTML = '';
+        }
+        window.onclick = function (event) {
+            if (event.target == modalSolic) { fecharModalSolicitacao(); }
+        }
+
+        /** Carrega as Solicitações salvas na tabela */
+        function carregarOSSolicitadas() {
+            const tabelaBody = document.querySelector('#tabela-os-solicitadas tbody');
+            tabelaBody.innerHTML = '';
+
+            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
+
+            if (osSolicitadas.length === 0) {
+                tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma Solicitação de OS encontrada.</td></tr>';
+                return;
+            }
+
+            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
+
+            osSolicitadas.forEach((solicitacao, index) => {
+                const row = tabelaBody.insertRow();
+                let dataSolicFormatada = formatarDataHora(solicitacao['data-solicitacao']);
+                let prioridadeClasse = '';
+                let prioridadeTexto = solicitacao['prioridade'] || 'N/A';
+                switch (prioridadeTexto.toLowerCase()) {
+                    case 'baixa': prioridadeClasse = 'prioridade-baixa'; break;
+                    case 'media': prioridadeClasse = 'prioridade-media'; break;
+                    case 'alta': prioridadeClasse = 'prioridade-alta'; break;
+                    case 'urgencia': prioridadeClasse = 'prioridade-urgencia'; break;
+                }
+
+                // Escapa o ID da solicitação caso contenha caracteres especiais
+                const idSolicitacaoEscapado = encodeURIComponent(solicitacao['id-solicitacao'] || '');
+
+                row.innerHTML = `
+                    <td>${solicitacao['id-solicitacao'] || 'N/A'}</td>
+                    <td>${solicitacao['solicitante'] || 'N/A'}</td>
+                    <td>${dataSolicFormatada}</td>
+                    <td class="prioridade-cell ${prioridadeClasse}">${prioridadeTexto}</td>
+                    <td>${solicitacao['status'] || 'Solicitada'}</td>
+                    <td class="acoes">
+                        <button class="ver" onclick="verSolicitacao(${index})">Ver</button>
+                        <button class="fazer" onclick="irParaEmitirOS('${solicitacao['id-solicitacao']}')">Fazer</button>
+                        <button class="imprimir" onclick="imprimirSolicitacao(${index})">Imprimir</button>
+                        <button class="compartilhar" onclick="compartilharSolicitacao(${index})">Compartilhar</button>
+                    </td>
+                `;
+            });
+        }
+
+        /** Redireciona para a página de emissão de OS, passando o ID da solicitação */
+        function irParaEmitirOS(idSolicitacao) {
+            if (!idSolicitacao) {
+                console.error("ID da Solicitação não fornecido para irParaEmitirOS");
+                alert("Erro: Não foi possível identificar a solicitação para iniciar a OS.");
+                return;
+            }
+            // Constrói a URL com o ID da solicitação como parâmetro
+            const urlDestino = `os.html?solicitacaoId=${encodeURIComponent(idSolicitacao)}`;
+            console.log("Redirecionando para:", urlDestino);
+            window.location.href = urlDestino;
+        }
+
+
+        /** Formata valor (reutilizado) */
+        function formatarValor(valor) { if (!valor || valor === 'null' || valor === 'undefined') return 'N/A'; if (typeof valor === 'string') { if (valor.toLowerCase() === 's' || valor.toLowerCase() === 'sim') return 'Sim'; if (valor.toLowerCase() === 'n' || valor.toLowerCase() === 'nao' || valor.toLowerCase() === 'não') return 'Não'; if (valor.toLowerCase() === 'na') return 'N/A'; } if (Array.isArray(valor)) { return valor.length > 0 ? valor.join(', ') : 'N/A'; } return valor; }
+        /** Formata data/hora (reutilizado) */
+        function formatarDataHora(isoString) { if (!isoString) return 'N/A'; try { return new Date(isoString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch (e) { return isoString; } }
+
+        /** Exibe detalhes da SOLICITAÇÃO no modal */
+        function verSolicitacao(index) {
+            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
+            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
+            const solic = osSolicitadas[index];
+            if (!solic) return;
+            let detalhesHtml = `<h2>Detalhes da Solicitação: ${solic['id-solicitacao']}</h2>`;
+            for (const key in solic) { if (solic.hasOwnProperty(key)) { let chaveFormatada = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); let valorFormatado = solic[key]; if (key.includes('data') || key.includes('prazo')) { valorFormatado = formatarDataHora(valorFormatado); } else { valorFormatado = formatarValor(valorFormatado); } detalhesHtml += `<p><strong>${chaveFormatada}:</strong> ${valorFormatado}</p>`; } }
+            modalContentSolic.innerHTML = detalhesHtml;
+            modalSolic.style.display = "block";
+        }
+
+        /** Abre janela de impressão com detalhes da SOLICITAÇÃO */
+        function imprimirSolicitacao(index) {
+            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
+            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
+            const solic = osSolicitadas[index];
+            if (!solic) return;
+            let printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Imprimir Solicitação OS - ' + solic['id-solicitacao'] + '</title>');
+            printWindow.document.write(`<style> body { font-family: sans-serif; line-height: 1.4; font-size: 10pt; margin: 20px;} h2, h3 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 1.5em; } h2 { font-size: 14pt; text-align: center;} h3 { font-size: 11pt;} p { margin: 5px 0; } strong { font-weight: bold; } </style>`);
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(`<h2>Solicitação de OS Nº ${solic['id-solicitacao']}</h2>`);
+            for (const key in solic) { if (solic.hasOwnProperty(key)) { let chaveFormatada = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); let valorFormatado = solic[key]; if (key.includes('data') || key.includes('prazo')) { valorFormatado = formatarDataHora(valorFormatado); } else { valorFormatado = formatarValor(valorFormatado); } printWindow.document.write(`<p><strong>${chaveFormatada}:</strong> ${valorFormatado}</p>`); } }
+            printWindow.document.write('</body></html>');
+            printWindow.document.close(); printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+            alert("Na janela de impressão, você pode escolher 'Salvar como PDF' para gerar um arquivo PDF.");
+        }
+
+        /** Tenta compartilhar os detalhes da solicitação */
+        async function compartilharSolicitacao(index) {
+            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
+            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
+            const solic = osSolicitadas[index];
+            if (!solic) return;
+            const textoCompartilhar = `Solicitação de OS: ${solic['id-solicitacao']}\nSolicitante: ${solic['solicitante']}\nData: ${formatarDataHora(solic['data-solicitacao'])}\nÁrea: ${solic['area-manutencao']}\nPrioridade: ${solic['prioridade']}\nDescrição: ${solic['descricao-solicitacao']}`;
+            if (navigator.share) {
+                try { await navigator.share({ title: `Solicitação de OS ${solic['id-solicitacao']}`, text: textoCompartilhar }); } catch (err) { if (err.name !== 'AbortError') { console.error('Erro ao compartilhar:', err); alert('Não foi possível compartilhar a solicitação.'); } }
+            } else { alert('Seu navegador não suporta compartilhamento direto. Use Imprimir/Salvar como PDF.'); }
+        }
+
+        // --- Inicialização da Página ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarOSSolicitadas();
+        });
+
+    </script>
+</body>
+
+</html>

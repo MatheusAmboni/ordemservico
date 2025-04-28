@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS/APR Concluídas</title>
+    <style>
+        /* Estilos CSS idênticos ao ossolicitadas.html, incluindo logo neon */
+        :root {
+            --cor-laranja-principal: #FF8C00;
+            --cor-laranja-secundario: #FFA500;
+            --cor-laranja-hover: #e67e00;
+            --cor-verde: #2E8B57;
+            --cor-verde-hover: #256d44;
+            --cor-azul-info: #5bc0de;
+            --cor-azul-info-hover: #31b0d5;
+            --cor-azul-imprimir: #4682B4;
+            /* SteelBlue */
+            --cor-azul-imprimir-hover: #3a6a91;
+            --cor-cinza-salvar: #777;
+            --cor-cinza-salvar-hover: #555;
+            --cor-texto: #333333;
+            --cor-fundo: #f9f9f9;
+            --cor-branco: #FFFFFF;
+            --cor-borda: #ddd;
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 1rem auto;
+            background-color: var(--cor-branco);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--cor-laranja-principal);
+        }
+
+        /* Logo */
+        .logo-container {
+            position: relative;
+            width: 220px;
+            height: 130px;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-imagem {
+            display: block;
+            max-width: 180px;
+            max-height: 90px;
+            width: auto;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Classe para a imagem */
+        .logo-frame {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border: 3px solid var(--cor-laranja-principal);
+            z-index: 1;
+            border-radius: 5px;
+            animation: neon-oscillate 4s linear infinite;
+        }
+
+        @keyframes neon-oscillate {
+
+            0%,
+            100% {
+                border-color: var(--cor-laranja-secundario);
+                box-shadow: 0 0 5px var(--cor-laranja-secundario), 0 0 10px var(--cor-laranja-secundario), 0 0 15px var(--cor-laranja-principal), inset 0 0 5px var(--cor-laranja-secundario);
+            }
+
+            50% {
+                border-color: var(--cor-verde);
+                box-shadow: 0 0 5px var(--cor-verde), 0 0 10px var(--cor-verde), 0 0 15px var(--cor-verde-hover), inset 0 0 5px var(--cor-verde);
+            }
+        }
+
+        h1 {
+            color: var(--cor-laranja-principal);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 0;
+        }
+
+        /* Botões de Navegação no Topo */
+        .botoes-topo {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Botão de Voltar e Botão de Nova OS/APR Atualizado */
+        .botao-menu,
+        .botao-nova-os-apr {
+            border: none;
+            padding: 0.8rem 1.4rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            color: var(--cor-branco);
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .botao-menu {
+            background-color: var(--cor-verde);
+        }
+
+        .botao-nova-os-apr {
+            background-color: var(--cor-laranja-secundario);
+        }
+
+        /* Nome da classe atualizado semanticamente */
+        .botao-menu:hover {
+            background-color: var(--cor-verde-hover);
+            transform: translateY(-2px);
+        }
+
+        .botao-nova-os-apr:hover {
+            background-color: var(--cor-laranja-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Tabela */
+        .tabela-os-apr-container {
+            overflow-x: auto;
+        }
+
+        /* Nome da classe atualizado */
+        .tabela-os-apr {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        /* Nome da classe atualizado */
+        .tabela-os-apr th,
+        .tabela-os-apr td {
+            border: 1px solid var(--cor-borda);
+            padding: 0.9rem;
+            text-align: left;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .tabela-os-apr th {
+            background-color: var(--cor-laranja-secundario);
+            color: var(--cor-branco);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tabela-os-apr tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .tabela-os-apr tr:hover {
+            background-color: #fff3e0;
+        }
+
+        /* Botões de Ação na Tabela */
+        .tabela-os-apr td .acoes button {
+            color: var(--cor-branco);
+            border: none;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.4rem;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-bottom: 0.3rem;
+        }
+
+        .tabela-os-apr td .acoes button.ver {
+            background-color: var(--cor-laranja-principal);
+        }
+
+        .tabela-os-apr td .acoes button.ver:hover {
+            background-color: var(--cor-laranja-hover);
+        }
+
+        .tabela-os-apr td .acoes button.imprimir {
+            background-color: var(--cor-azul-imprimir);
+        }
+
+        .tabela-os-apr td .acoes button.imprimir:hover {
+            background-color: var(--cor-azul-imprimir-hover);
+        }
+
+        .tabela-os-apr td .acoes button.salvar {
+            background-color: var(--cor-cinza-salvar);
+        }
+
+        /* Botão Download */
+        .tabela-os-apr td .acoes button.salvar:hover {
+            background-color: var(--cor-cinza-salvar-hover);
+        }
+
+        /* Modal */
+        #detalhes-os-apr-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* ID atualizado */
+        #detalhes-os-apr-content {
+            background-color: var(--cor-branco);
+            margin: 5% auto;
+            padding: 25px 30px;
+            border: 1px solid #888;
+            width: 85%;
+            max-width: 800px;
+            border-radius: 8px;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-top: 5px solid var(--cor-laranja-principal);
+        }
+
+        /* ID atualizado */
+        #fechar-modal-os-apr {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* ID atualizado */
+        #fechar-modal-os-apr:hover,
+        #fechar-modal-os-apr:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #detalhes-os-apr-texto h2 {
+            font-size: 1.6rem;
+            color: var(--cor-laranja-principal);
+            text-align: center;
+            border: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ID atualizado */
+        #detalhes-os-apr-texto h3 {
+            font-size: 1.2rem;
+            color: var(--cor-laranja-secundario);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 0.4rem;
+        }
+
+        #detalhes-os-apr-texto p {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        #detalhes-os-apr-texto strong {
+            color: var(--cor-texto);
+            font-weight: 600;
+        }
+
+        #detalhes-os-apr-texto ul {
+            padding-left: 20px;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #detalhes-os-apr-texto li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .container {
+                padding: 1rem 1.5rem;
+            }
+
+            .tabela-os-apr th,
+            .tabela-os-apr td {
+                font-size: 0.9rem;
+                padding: 0.7rem;
+            }
+
+            /* Classe da tabela atualizada */
+            .tabela-os-apr td .acoes button {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.7rem;
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0.4rem;
+                margin-right: 0;
+            }
+
+            .botoes-topo {
+                justify-content: center;
+            }
+
+            #detalhes-os-apr-content {
+                width: 92%;
+                margin: 8% auto;
+                padding: 20px;
+            }
+
+            /* ID atualizado */
+            #detalhes-os-apr-texto h2 {
+                font-size: 1.4rem;
+            }
+
+            /* ID atualizado */
+            #detalhes-os-apr-texto h3 {
+                font-size: 1.1rem;
+            }
+
+            #detalhes-os-apr-texto p,
+            #detalhes-os-apr-texto li {
+                font-size: 0.9rem;
+            }
+
+            .logo-container {
+                width: 180px;
+                height: 110px;
+                margin-bottom: 1.5rem;
+            }
+
+            .logo-imagem {
+                max-width: 150px;
+                max-height: 75px;
+            }
+
+            .logo-frame {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-frame"></div>
+            <img src="logo.webp" alt="Logo da Empresa" class="logo-imagem">
+        </div>
+        <h1>OS/APR Concluídas</h1>
+
+        <div class="botoes-topo">
+            <a href="menu.html" class="botao-menu">Voltar ao Menu</a>
+            <a href="os.html" class="botao-nova-os-apr">Emitir Nova OS/APR</a>
+        </div>
+
+        <div class="tabela-os-apr-container">
+            <table class="tabela-os-apr" id="tabela-os-apr-concluidas">
+                <thead>
+                    <tr>
+                        <th>Nº OS/APR</th>
+                        <th>Tipo</th>
+                        <th>Área</th>
+                        <th>Local/Equip.</th>
+                        <th>Data Término</th>
+                        <th>Solicitante</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Carregando OS/APR Concluídas...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detalhes-os-apr-modal">
+        <div id="detalhes-os-apr-content">
+            <span id="fechar-modal-os-apr" onclick="fecharModalOSAPR()">&times;</span>
+            <div id="detalhes-os-apr-texto">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis do Modal Atualizadas
+        const modalOSAPR = document.getElementById('detalhes-os-apr-modal');
+        const modalContentOSAPR = document.getElementById('detalhes-os-apr-texto');
+        // Chave do localStorage permanece a mesma para buscar os dados
+        const STORAGE_KEY_OS_CONCLUIDAS_VIEW = 'osConcluidas';
+
+        // Função Fechar Modal Atualizada
+        function fecharModalOSAPR() {
+            modalOSAPR.style.display = "none";
+            modalContentOSAPR.innerHTML = '';
+        }
+        window.onclick = function (event) {
+            if (event.target == modalOSAPR) { fecharModalOSAPR(); }
+        }
+
+        /** Carrega as OS/APR salvas na tabela */
+        function carregarOSAPRConcluidas() {
+            // ID da Tabela Atualizado
+            const tabelaBody = document.querySelector('#tabela-os-apr-concluidas tbody');
+            tabelaBody.innerHTML = '';
+
+            const osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS_VIEW) || '[]');
+
+            if (osConcluidas.length === 0) {
+                tabelaBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhuma OS/APR concluída encontrada.</td></tr>';
+                return;
+            }
+
+            // Ordena pelo número interno 'numero-os' mas exibe como 'OS/APR'
+            osConcluidas.sort((a, b) => (b['numero-os'] || '').localeCompare(a['numero-os'] || ''));
+
+            osConcluidas.forEach((os, index) => {
+                const row = tabelaBody.insertRow();
+                let dataTerminoFormatada = formatarDataHora(os['data-termino']);
+
+                // Preenche as células - Note que usamos os['numero-os'] internamente
+                row.innerHTML = `
+                    <td>${os['numero-os'] || 'N/A'}</td>
+                    <td>${os['tipo-os'] || 'N/A'}</td>
+                    <td>${os['area-manutencao'] || 'N/A'}</td>
+                    <td>${os['localizacao'] || 'N/A'}</td>
+                    <td>${dataTerminoFormatada}</td>
+                    <td>${os['solicitante'] || 'N/A'}</td>
+                    <td class="acoes">
+                        <button class="ver" onclick="verOSAPR(${index})">Ver</button>
+                        <button class="imprimir" onclick="imprimirOSAPR(${index})">Imprimir</button>
+                        <button class="salvar" onclick="salvarOSAPR(${index})">Download</button>
+                    </td>
+                `;
+            });
+        }
+
+        /* Funções formatarValor e formatarDataHora permanecem inalteradas */
+        function formatarValor(valor) { if (!valor || valor === 'null' || valor === 'undefined') return 'N/A'; if (typeof valor === 'string') { if (valor.toLowerCase() === 's' || valor.toLowerCase() === 'sim') return 'Sim'; if (valor.toLowerCase() === 'n' || valor.toLowerCase() === 'nao' || valor.toLowerCase() === 'não') return 'Não'; if (valor.toLowerCase() === 'na') return 'N/A'; } if (Array.isArray(valor)) { return valor.length > 0 ? valor.join(', ') : 'N/A'; } return valor; }
+        function formatarDataHora(isoString) { if (!isoString) return 'N/A'; try { return new Date(isoString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch (e) { return isoString; } }
+
+        /** Exibe detalhes da OS/APR no modal */
+        function verOSAPR(index) { // Nome da função atualizado
+            const osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS_VIEW) || '[]');
+            osConcluidas.sort((a, b) => (b['numero-os'] || '').localeCompare(a['numero-os'] || ''));
+            const os = osConcluidas[index];
+            if (!os) return;
+
+            // Título do Modal Atualizado
+            let detalhesHtml = `<h2>Detalhes da OS/APR: ${os['numero-os']}</h2>`;
+
+            // Verifica se veio de uma solicitação e adiciona referência
+            if (os['solicitacao-id-ref']) {
+                detalhesHtml += `<p style="font-style: italic; color: #555;">(Originada da Solicitação: ${os['solicitacao-id-ref']})</p>`;
+            }
+
+            detalhesHtml += `<h3>Informações Gerais</h3>`;
+            detalhesHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`;
+            // ... (restante da montagem do HTML igual à função verOS anterior)
+            detalhesHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`;
+            detalhesHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`;
+            detalhesHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`;
+            detalhesHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`;
+            detalhesHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
+
+            detalhesHtml += `<h3>Equipe</h3>`;
+            detalhesHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`;
+            let executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
+            detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
+
+            detalhesHtml += `<h3>Segurança / APR</h3>`; // Título da seção atualizado
+            detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
+            detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
+            detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+            if (os['riscos'] && os['riscos'].length > 0) {
+                detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`; os['riscos'].forEach(r => { detalhesHtml += `<li>${r}</li>`; }); detalhesHtml += `</ul>`;
+                if (os['riscos'].includes('Outros') && os['riscos-outros-desc']) { detalhesHtml += `<p><strong>Descrição Outros Riscos:</strong> ${formatarValor(os['riscos-outros-desc'])}</p>`; }
+            } else { detalhesHtml += `<p><strong>Riscos Identificados:</strong> Nenhum marcado</p>`; }
+
+            function listarItens(titulo, itensArray) { /* ... inalterada ... */
+                let html = ''; if (itensArray && itensArray.length > 0) { html += `<h3>${titulo}</h3><ul>`; itensArray.forEach(item => { html += `<li>${item.nome} (Qtd: ${item.quantidade})</li>`; }); html += `</ul>`; } return html;
+            }
+            detalhesHtml += listarItens('EPIs Utilizados', os['epis_selecionados']);
+            detalhesHtml += listarItens('EPCs Utilizados', os['epcs_selecionados']);
+            detalhesHtml += listarItens('Ferramentas Utilizadas', os['ferramentas_selecionadas']);
+            detalhesHtml += listarItens('Materiais Utilizados', os['materiais_selecionados']);
+
+            detalhesHtml += `<h3>Observações / Conclusão</h3>`;
+            detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
+
+            // Modal Atualizado
+            modalContentOSAPR.innerHTML = detalhesHtml;
+            modalOSAPR.style.display = "block";
+        }
+
+        /** Imprime a OS/APR */
+        function imprimirOSAPR(index) { // Nome da função atualizado
+            const osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS_VIEW) || '[]');
+            osConcluidas.sort((a, b) => (b['numero-os'] || '').localeCompare(a['numero-os'] || ''));
+            const os = osConcluidas[index];
+            if (!os) return;
+
+            let printWindow = window.open('', '_blank');
+            // Título da Janela de Impressão Atualizado
+            printWindow.document.write('<html><head><title>Imprimir OS/APR - ' + os['numero-os'] + '</title>');
+            printWindow.document.write(`
+                  <style> body { font-family: sans-serif; line-height: 1.5; font-size: 10pt; margin: 20px;} h2, h3 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 1.5em; } h2 { font-size: 14pt; text-align: center;} h3 { font-size: 11pt;} p { margin: 4px 0; } strong { font-weight: bold; } ul { padding-left: 20px; margin: 5px 0; list-style-position: inside;} li { margin-bottom: 2px; } table { width: 100%; border-collapse: collapse; margin-top: 0.5em; margin-bottom: 1em;} th, td { border: 1px solid #ccc; padding: 5px; text-align: left; vertical-align: top; } th { background-color: #eee; font-weight: bold;} </style>
+              `);
+            printWindow.document.write('</head><body>');
+            // Título no Documento Atualizado
+            printWindow.document.write(`<h2>OS/APR Nº ${os['numero-os']}</h2>`);
+            // Adiciona referência da solicitação, se existir
+            if (os['solicitacao-id-ref']) {
+                printWindow.document.write(`<p style="text-align: center; font-style: italic; color: #555;">(Originada da Solicitação: ${os['solicitacao-id-ref']})</p>`);
+            }
+
+            // Monta o restante do HTML (igual à função verOSAPR, mas escrevendo na janela)
+            let printHtml = '';
+            printHtml += `<h3>Informações Gerais</h3>`; printHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`; printHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`; printHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`; printHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`; printHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`; printHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
+            printHtml += `<h3>Equipe</h3>`; printHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`; let executantesP = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', '); printHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantesP)}</p>`;
+            printHtml += `<h3>Segurança / APR</h3>`; printHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`; printHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`; printHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`; if (os['riscos'] && os['riscos'].length > 0) { printHtml += `<p><strong>Riscos Identificados:</strong> ${os['riscos'].join(', ')}</p>`; if (os['riscos'].includes('Outros') && os['riscos-outros-desc']) { printHtml += `<p><strong>Descrição Outros Riscos:</strong> ${formatarValor(os['riscos-outros-desc'])}</p>`; } }
+            function listarItensTabela(titulo, itensArray) { let html = ''; if (itensArray && itensArray.length > 0) { html += `<h3>${titulo}</h3><table><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>`; itensArray.forEach(item => { html += `<tr><td>${item.nome}</td><td>${item.quantidade}</td></tr>`; }); html += `</tbody></table>`; } return html; }
+            printHtml += listarItensTabela('EPIs Utilizados', os['epis_selecionados']); printHtml += listarItensTabela('EPCs Utilizados', os['epcs_selecionados']); printHtml += listarItensTabela('Ferramentas Utilizadas', os['ferramentas_selecionadas']); printHtml += listarItensTabela('Materiais Utilizados', os['materiais_selecionados']);
+            printHtml += `<h3>Observações / Conclusão</h3>`; printHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
+
+            printWindow.document.write(printHtml);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close(); printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+        }
+
+        /** Faz o download da OS/APR como JSON */
+        function salvarOSAPR(index) { // Nome da função atualizado
+            const osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS_VIEW) || '[]');
+            osConcluidas.sort((a, b) => (b['numero-os'] || '').localeCompare(a['numero-os'] || ''));
+            const os = osConcluidas[index];
+            if (!os) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(os, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            // Nome do Arquivo Atualizado
+            downloadAnchorNode.setAttribute("download", `${os['numero-os'] || 'os-apr_export'}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+
+        // --- Inicialização da Página ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarOSAPRConcluidas(); // Nome da função de carregamento atualizado
+        });
+
+    </script>
+</body>
+
+</html>
