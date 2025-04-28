@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Ordem de Serviço</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         /* Estilos base (cores, container, etc.) - similares aos outros arquivos */
         :root {
@@ -403,6 +408,7 @@
     </div>
 
     <script>
+
         // --- Constantes e Variáveis Globais ---
         const STORAGE_KEY_NOMES_OS = 'nomesCadastradosOS';
         const STORAGE_KEY_OS_SOLICITADAS = 'osSolicitadas'; // Onde as solicitações serão salvas
@@ -416,6 +422,51 @@
                 setTimeout(() => { feedbackElement.textContent = ''; }, 2500);
             }
         }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkuAOsMsGxqCfrhZPGrXag8R7LeaIR9FQ",
+            authDomain: "ordemservico-ef731.firebaseapp.com",
+            databaseURL: "https://ordemservico-ef731-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-ef731",
+            storageBucket: "ordemservico-ef731.firebasestorage.app",
+            messagingSenderId: "339669417107",
+            appId: "1:339669417107:web:4ec47333f9a02aad5ae166"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.getElementById('solicitar-os-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const solicitacao = {
+                id: Date.now(),
+                solicitante: document.getElementById('solicitante-select').value,
+                areaManutencao: document.getElementById('area-manutencao').value,
+                equipeExecutora: document.getElementById('equipe-executora').value,
+                prioridade: document.getElementById('prioridade').value,
+                prazoConclusao: document.getElementById('prazo-conclusao').value,
+                descricao: document.getElementById('descricao-solicitacao').value,
+                dataSolicitacao: document.getElementById('data-solicitacao').value,
+                status: 'Solicitada'
+            };
+
+            if (!solicitacao.solicitante || !solicitacao.descricao) {
+                alert('Por favor, preencha pelo menos o Solicitante e a Descrição da Necessidade.');
+                return;
+            }
+
+            database.ref('solicitacoes').push(solicitacao)
+                .then(() => {
+                    alert('Solicitação de Ordem de Serviço gerada com sucesso!');
+                    document.getElementById('solicitar-os-form').reset();
+                    setDataHoraSolicitacao(); // Atualiza a data/hora após reset
+                })
+                .catch((error) => {
+                    console.error("Erro ao gerar solicitação de ordem de serviço:", error);
+                });
+        });
+
 
         // --- Funções de Gerenciamento de Nomes (Reutilizadas) ---
         function salvarNovoNomeOS(inputId) {
@@ -473,44 +524,6 @@
                 selectPrioridade.classList.add(`prioridade-${cor}`);
             }
         }
-
-        // --- Lógica de Salvamento da SOLICITAÇÃO ---
-        document.getElementById('solicitar-os-form').addEventListener('submit', function (event) {
-            event.preventDefault(); // Impede envio padrão
-
-            const formData = new FormData(this);
-            const solicitacaoData = {};
-
-            // Coleta todos os dados do formulário
-            formData.forEach((value, key) => {
-                solicitacaoData[key] = value;
-            });
-
-            // Validação básica (Exemplo: verificar se solicitante e descrição foram preenchidos)
-            if (!solicitacaoData['solicitante'] || !solicitacaoData['descricao-solicitacao']) {
-                alert('Por favor, preencha pelo menos o Solicitante e a Descrição da Necessidade.');
-                return; // Interrompe o salvamento
-            }
-
-            // Gera ID único para a solicitação
-            let counter = parseInt(localStorage.getItem(STORAGE_KEY_OS_SOLICITADA_COUNTER) || '0');
-            counter++;
-            solicitacaoData['id-solicitacao'] = `REQ-${String(counter).padStart(5, '0')}-${Date.now()}`; // ID mais robusto
-            localStorage.setItem(STORAGE_KEY_OS_SOLICITADA_COUNTER, String(counter));
-
-            // Adiciona status inicial (ex: 'Solicitada')
-            solicitacaoData['status'] = 'Solicitada';
-
-            // Salva a solicitação no localStorage
-            let osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS) || '[]');
-            osSolicitadas.push(solicitacaoData);
-            localStorage.setItem(STORAGE_KEY_OS_SOLICITADAS, JSON.stringify(osSolicitadas));
-
-            // Feedback e redirecionamento (pode ir para ossolicitadas.html ou menu)
-            alert(`Solicitação ${solicitacaoData['id-solicitacao']} salva com sucesso!`);
-            window.location.href = 'ossolicitadas.html'; // Redireciona para a lista de solicitações
-            // ou window.location.href = 'menuos.html'; // Para voltar ao menu
-        });
 
         // --- Inicialização da Página ---
         document.addEventListener('DOMContentLoaded', () => {
