@@ -755,6 +755,8 @@
         </form>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         // --- Constantes Globais ---
         const STORAGE_KEY_NOMES_OS = 'nomesCadastradosOS';
@@ -765,6 +767,20 @@
         const STORAGE_KEY_OS_SOLICITADAS = 'osSolicitadas'; // Para buscar dados da solicitação
         const STORAGE_KEY_OS_CONCLUIDAS = 'osConcluidas';   // Onde a OS final será salva
         const STORAGE_KEY_OS_COUNTER = 'osCounter';
+
+        // --- Firebase Configuração ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkuAOsMsGxqCfrhZPGrXag8R7LeaIR9FQ",
+            authDomain: "ordemservico-ef731.firebaseapp.com",
+            databaseURL: "https://ordemservico-ef731-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-ef731",
+            storageBucket: "ordemservico-ef731.firebasestorage.app",
+            messagingSenderId: "339669417107",
+            appId: "1:339669417107:web:4ec47333f9a02aad5ae166"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
         // --- Funções de Feedback ---
         function mostrarFeedback(feedbackId, mensagem) { /* ... inalterada ... */
@@ -863,8 +879,12 @@
             const osData = {};
 
             formData.forEach((value, key) => {
-                if (key === 'riscos') { if (!osData[key]) { osData[key] = []; } osData[key].push(value); }
-                else { osData[key] = value; }
+                if (key === 'riscos') {
+                    if (!osData[key]) { osData[key] = []; }
+                    osData[key].push(value);
+                } else {
+                    osData[key] = value;
+                }
             });
 
             // Adiciona os itens selecionados (EPIs, etc.)
@@ -885,24 +905,15 @@
             osData['numero-os'] = `OS-${String(osCounter).padStart(5, '0')}`;
             localStorage.setItem(STORAGE_KEY_OS_COUNTER, String(osCounter));
 
-            // Salva a OS Concluída
-            let osConcluidas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_CONCLUIDAS) || '[]');
-            osConcluidas.push(osData);
-            localStorage.setItem(STORAGE_KEY_OS_CONCLUIDAS, JSON.stringify(osConcluidas));
-
-            // >>> NOVO: Opcional - Remover a solicitação original da lista de solicitadas <<<
-            // const solicitacaoIdOriginal = osData['solicitacao-id-ref'];
-            // if (solicitacaoIdOriginal) {
-            //     let osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS) || '[]');
-            //     osSolicitadas = osSolicitadas.filter(s => s['id-solicitacao'] !== solicitacaoIdOriginal);
-            //     localStorage.setItem(STORAGE_KEY_OS_SOLICITADAS, JSON.stringify(osSolicitadas));
-            //     console.log(`Solicitação ${solicitacaoIdOriginal} removida da lista de pendentes.`);
-            // }
-            // Comentei a remoção acima, pois pode ser útil manter o histórico. Descomente se quiser remover.
-
-
-            alert(`OS ${osData['numero-os']} salva com sucesso!`);
-            window.location.href = 'osok.html';
+            // Salva a OS no Firebase
+            database.ref('ordensServico').push(osData)
+                .then(() => {
+                    alert(`OS ${osData['numero-os']} salva com sucesso no banco de dados!`);
+                    window.location.href = 'osok.html';
+                })
+                .catch((error) => {
+                    console.error("Erro ao salvar OS no banco de dados:", error);
+                });
         });
 
         // --- Inicialização da Página ---

@@ -436,10 +436,24 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkuAOsMsGxqCfrhZPGrXag8R7LeaIR9FQ",
+            authDomain: "ordemservico-ef731.firebaseapp.com",
+            databaseURL: "https://ordemservico-ef731-default-rtdb.firebaseio.com",
+            projectId: "ordemservico-ef731",
+            storageBucket: "ordemservico-ef731.firebasestorage.app",
+            messagingSenderId: "339669417107",
+            appId: "1:339669417107:web:4ec47333f9a02aad5ae166"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const modalSolic = document.getElementById('detalhes-solicitacao-modal');
         const modalContentSolic = document.getElementById('detalhes-solicitacao-texto');
-        const STORAGE_KEY_OS_SOLICITADAS_VIEW = 'osSolicitadas';
 
         function fecharModalSolicitacao() {
             modalSolic.style.display = "none";
@@ -449,49 +463,55 @@
             if (event.target == modalSolic) { fecharModalSolicitacao(); }
         }
 
-        /** Carrega as Solicitações salvas na tabela */
+        /** Carrega as Solicitações salvas no Firebase */
         function carregarOSSolicitadas() {
             const tabelaBody = document.querySelector('#tabela-os-solicitadas tbody');
-            tabelaBody.innerHTML = '';
+            tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Carregando Solicitações...</td></tr>';
 
-            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
+            database.ref('solicitacoes').once('value')
+                .then(snapshot => {
+                    const solicitacoes = snapshot.val();
+                    tabelaBody.innerHTML = '';
 
-            if (osSolicitadas.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma Solicitação de OS encontrada.</td></tr>';
-                return;
-            }
+                    if (!solicitacoes) {
+                        tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma Solicitação de OS encontrada.</td></tr>';
+                        return;
+                    }
 
-            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
+                    const solicitacoesArray = Object.entries(solicitacoes).map(([id, data]) => ({ id, ...data }));
+                    solicitacoesArray.sort((a, b) => b.id - a.id);
 
-            osSolicitadas.forEach((solicitacao, index) => {
-                const row = tabelaBody.insertRow();
-                let dataSolicFormatada = formatarDataHora(solicitacao['data-solicitacao']);
-                let prioridadeClasse = '';
-                let prioridadeTexto = solicitacao['prioridade'] || 'N/A';
-                switch (prioridadeTexto.toLowerCase()) {
-                    case 'baixa': prioridadeClasse = 'prioridade-baixa'; break;
-                    case 'media': prioridadeClasse = 'prioridade-media'; break;
-                    case 'alta': prioridadeClasse = 'prioridade-alta'; break;
-                    case 'urgencia': prioridadeClasse = 'prioridade-urgencia'; break;
-                }
+                    solicitacoesArray.forEach((solicitacao, index) => {
+                        const row = tabelaBody.insertRow();
+                        let dataSolicFormatada = formatarDataHora(solicitacao.dataSolicitacao);
+                        let prioridadeClasse = '';
+                        let prioridadeTexto = solicitacao.prioridade || 'N/A';
+                        switch (prioridadeTexto.toLowerCase()) {
+                            case 'baixa': prioridadeClasse = 'prioridade-baixa'; break;
+                            case 'media': prioridadeClasse = 'prioridade-media'; break;
+                            case 'alta': prioridadeClasse = 'prioridade-alta'; break;
+                            case 'urgencia': prioridadeClasse = 'prioridade-urgencia'; break;
+                        }
 
-                // Escapa o ID da solicitação caso contenha caracteres especiais
-                const idSolicitacaoEscapado = encodeURIComponent(solicitacao['id-solicitacao'] || '');
-
-                row.innerHTML = `
-                    <td>${solicitacao['id-solicitacao'] || 'N/A'}</td>
-                    <td>${solicitacao['solicitante'] || 'N/A'}</td>
-                    <td>${dataSolicFormatada}</td>
-                    <td class="prioridade-cell ${prioridadeClasse}">${prioridadeTexto}</td>
-                    <td>${solicitacao['status'] || 'Solicitada'}</td>
-                    <td class="acoes">
-                        <button class="ver" onclick="verSolicitacao(${index})">Ver</button>
-                        <button class="fazer" onclick="irParaEmitirOS('${solicitacao['id-solicitacao']}')">Fazer</button>
-                        <button class="imprimir" onclick="imprimirSolicitacao(${index})">Imprimir</button>
-                        <button class="compartilhar" onclick="compartilharSolicitacao(${index})">Compartilhar</button>
-                    </td>
-                `;
-            });
+                        row.innerHTML = `
+                            <td>${solicitacao.id || 'N/A'}</td>
+                            <td>${solicitacao.solicitante || 'N/A'}</td>
+                            <td>${dataSolicFormatada}</td>
+                            <td class="prioridade-cell ${prioridadeClasse}">${prioridadeTexto}</td>
+                            <td>${solicitacao.status || 'Solicitada'}</td>
+                            <td class="acoes">
+                                <button class="ver" onclick="verSolicitacao(${index})">Ver</button>
+                                <button class="fazer" onclick="irParaEmitirOS('${solicitacao.id}')">Fazer</button>
+                                <button class="imprimir" onclick="imprimirSolicitacao(${index})">Imprimir</button>
+                                <button class="compartilhar" onclick="compartilharSolicitacao(${index})">Compartilhar</button>
+                            </td>
+                        `;
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar solicitações do Firebase:", error);
+                    tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Erro ao carregar solicitações.</td></tr>';
+                });
         }
 
         /** Redireciona para a página de emissão de OS, passando o ID da solicitação */
@@ -506,7 +526,6 @@
             console.log("Redirecionando para:", urlDestino);
             window.location.href = urlDestino;
         }
-
 
         /** Formata valor (reutilizado) */
         function formatarValor(valor) { if (!valor || valor === 'null' || valor === 'undefined') return 'N/A'; if (typeof valor === 'string') { if (valor.toLowerCase() === 's' || valor.toLowerCase() === 'sim') return 'Sim'; if (valor.toLowerCase() === 'n' || valor.toLowerCase() === 'nao' || valor.toLowerCase() === 'não') return 'Não'; if (valor.toLowerCase() === 'na') return 'N/A'; } if (Array.isArray(valor)) { return valor.length > 0 ? valor.join(', ') : 'N/A'; } return valor; }
