@@ -481,28 +481,88 @@
                 });
         }
 
-        /** Exibe detalhes da OS/APR no modal */
+        /** Abre o modal com os detalhes da OS/APR */
         function verOSAPR(key) {
+            database.ref(`ordensServico/${key}`).once('value')
+            .then(snapshot => {
+                const os = snapshot.val();
+                if (!os) return;
+
+                let detalhesHtml = `<h2>Detalhes da OS/APR: ${os['numero-os']}</h2>`;
+                detalhesHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`;
+                detalhesHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`;
+                detalhesHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`;
+                detalhesHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`;
+                detalhesHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`;
+                detalhesHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
+                detalhesHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`;
+
+                const executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
+                detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
+
+                detalhesHtml += `<h3>Segurança / APR</h3>`;
+                detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
+                detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
+                detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+
+                if (os['riscos'] && os['riscos'].length > 0) {
+                detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
+                os['riscos'].forEach(r => { detalhesHtml += `<li>${r}</li>`; });
+                detalhesHtml += `</ul>`;
+                }
+
+                function listarItens(titulo, itensArray) {
+                let html = '';
+                if (itensArray && itensArray.length > 0) {
+                    html += `<h3>${titulo}</h3><ul>`;
+                    itensArray.forEach(item => {
+                    html += `<li>${item.nome} (Qtd: ${item.quantidade})</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                return html;
+                }
+                detalhesHtml += listarItens('EPIs Utilizados', os['epis_selecionados']);
+                detalhesHtml += listarItens('EPCs Utilizados', os['epcs_selecionados']);
+                detalhesHtml += listarItens('Ferramentas Utilizadas', os['ferramentas_selecionadas']);
+                detalhesHtml += listarItens('Materiais Utilizados', os['materiais_selecionados']);
+
+                detalhesHtml += `<h3>Observações / Conclusão</h3>`;
+                detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
+
+                const modalTexto = document.getElementById('detalhes-os-apr-texto');
+                modalTexto.innerHTML = detalhesHtml;
+
+                const modal = document.getElementById('detalhes-os-apr-modal');
+                modal.style.display = 'block';
+            })
+            .catch(error => {
+                console.error("Erro ao carregar detalhes da OS/APR:", error);
+            });
+        }
+
+        /** Fecha o modal de detalhes da OS/APR */
+        function fecharModalOSAPR() {
+            const modal = document.getElementById('detalhes-os-apr-modal');
+            modal.style.display = 'none';
+        }
+
+        /** Imprime os detalhes da OS/APR */
+        function imprimirOSAPR(key) {
             database.ref(`ordensServico/${key}`).once('value')
                 .then(snapshot => {
                     const os = snapshot.val();
                     if (!os) return;
 
                     let detalhesHtml = `<h2>Detalhes da OS/APR: ${os['numero-os']}</h2>`;
-                    if (os['solicitacao-id-ref']) {
-                        detalhesHtml += `<p style="font-style: italic; color: #555;">(Originada da Solicitação: ${os['solicitacao-id-ref']})</p>`;
-                    }
-
-                    detalhesHtml += `<h3>Informações Gerais</h3>`;
                     detalhesHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`;
                     detalhesHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`;
                     detalhesHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`;
                     detalhesHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`;
                     detalhesHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`;
                     detalhesHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
-
-                    detalhesHtml += `<h3>Equipe</h3>`;
                     detalhesHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`;
+
                     const executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
                     detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
 
@@ -510,15 +570,11 @@
                     detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
                     detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
                     detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+
                     if (os['riscos'] && os['riscos'].length > 0) {
                         detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
                         os['riscos'].forEach(r => { detalhesHtml += `<li>${r}</li>`; });
                         detalhesHtml += `</ul>`;
-                        if (os['riscos'].includes('Outros') && os['riscos-outros-desc']) {
-                            detalhesHtml += `<p><strong>Descrição Outros Riscos:</strong> ${formatarValor(os['riscos-outros-desc'])}</p>`;
-                        }
-                    } else {
-                        detalhesHtml += `<p><strong>Riscos Identificados:</strong> Nenhum marcado</p>`;
                     }
 
                     function listarItens(titulo, itensArray) {
@@ -540,11 +596,74 @@
                     detalhesHtml += `<h3>Observações / Conclusão</h3>`;
                     detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
 
-                    modalContentOSAPR.innerHTML = detalhesHtml;
-                    modalOSAPR.style.display = "block";
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>Imprimir OS/APR</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+                                    h2, h3 { color: #FF8C00; }
+                                    p, ul { margin: 0 0 10px; }
+                                    ul { padding-left: 20px; }
+                                    strong { color: #333; }
+                                </style>
+                            </head>
+                            <body>
+                                ${detalhesHtml}
+                            </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
                 })
                 .catch(error => {
-                    console.error("Erro ao carregar detalhes da OS/APR:", error);
+                    console.error("Erro ao carregar detalhes da OS/APR para impressão:", error);
+                });
+        }
+
+        /** Salva os detalhes da OS/APR como um arquivo JSON */
+        function salvarOSAPR(key) {
+            database.ref(`ordensServico/${key}`).once('value')
+                .then(snapshot => {
+                    const os = snapshot.val();
+                    if (!os) return;
+
+                    const osData = {
+                        numeroOS: os['numero-os'] || 'N/A',
+                        tipo: os['tipo-os'] || 'N/A',
+                        area: os['area-manutencao'] || 'N/A',
+                        localEquipamento: os['localizacao'] || 'N/A',
+                        descricaoServico: os['descricao-servico'] || 'N/A',
+                        dataEmissao: formatarDataHora(os['data-emissao']),
+                        dataTermino: formatarDataHora(os['data-termino']),
+                        solicitante: os['solicitante'] || 'N/A',
+                        executantes: [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', '),
+                        trabalhoQuente: os['trabalho-quente'] || 'N/A',
+                        aprNecessaria: os['apr-necessaria'] || 'N/A',
+                        inspecaoPrevia: os['inspecao-previa'] || 'N/A',
+                        riscos: os['riscos'] || [],
+                        riscosOutrosDesc: os['riscos-outros-desc'] || '',
+                        episSelecionados: os['epis_selecionados'] || [],
+                        epcsSelecionados: os['epcs_selecionados'] || [],
+                        ferramentasSelecionadas: os['ferramentas_selecionadas'] || [],
+                        materiaisSelecionados: os['materiais_selecionados'] || [],
+                        observacoes: os['observacoes'] || 'N/A'
+                    };
+
+                    const jsonContent = JSON.stringify(osData, null, 2);
+                    const blob = new Blob([jsonContent], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `OS_APR_${os['numero-os'] || 'desconhecido'}.json`;
+                    a.click();
+
+                    URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error("Erro ao salvar OS/APR como JSON:", error);
                 });
         }
 

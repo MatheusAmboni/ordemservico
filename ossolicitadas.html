@@ -439,6 +439,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
+        const STORAGE_KEY_OS_SOLICITADAS_VIEW = 'osSolicitadasView'; // Define the storage key
+
         const firebaseConfig = {
             apiKey: "AIzaSyCkuAOsMsGxqCfrhZPGrXag8R7LeaIR9FQ",
             authDomain: "ordemservico-ef731.firebaseapp.com",
@@ -503,7 +505,6 @@
                                 <button class="ver" onclick="verSolicitacao(${index})">Ver</button>
                                 <button class="fazer" onclick="irParaEmitirOS('${solicitacao.id}')">Fazer</button>
                                 <button class="imprimir" onclick="imprimirSolicitacao(${index})">Imprimir</button>
-                                <button class="compartilhar" onclick="compartilharSolicitacao(${index})">Compartilhar</button>
                             </td>
                         `;
                     });
@@ -513,6 +514,42 @@
                     tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Erro ao carregar solicitações.</td></tr>';
                 });
         }
+
+        /** Abre o modal com os detalhes da solicitação */
+        function verSolicitacao(index) {
+            database.ref('solicitacoes').once('value')
+                .then(snapshot => {
+                    const solicitacoes = snapshot.val();
+                    if (!solicitacoes) {
+                        console.error("Nenhuma solicitação encontrada no Firebase.");
+                        return;
+                    }
+
+                    const solicitacoesArray = Object.entries(solicitacoes).map(([id, data]) => ({ id, ...data }));
+                    solicitacoesArray.sort((a, b) => b.id - a.id);
+
+                    const solic = solicitacoesArray[index];
+                    if (!solic) return;
+
+                    const detalhes = `
+                <h2>Detalhes da Solicitação</h2>
+                <p><strong>ID da Solicitação:</strong> ${solic.id || 'N/A'}</p>
+                <p><strong>Solicitante:</strong> ${solic.solicitante || 'N/A'}</p>
+                <p><strong>Data da Solicitação:</strong> ${formatarDataHora(solic.dataSolicitacao)}</p>
+                <p><strong>Prioridade:</strong> ${solic.prioridade || 'N/A'}</p>
+                <p><strong>Status:</strong> ${solic.status || 'N/A'}</p>
+                <p><strong>Descrição:</strong> ${solic.descricao || 'N/A'}</p>
+                <p><strong>Observações:</strong> ${solic.observacoes || 'N/A'}</p>
+                `;
+
+                    modalContentSolic.innerHTML = detalhes;
+                    modalSolic.style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar solicitação do Firebase:", error);
+                });
+        }
+
 
         /** Redireciona para a página de emissão de OS, passando o ID da solicitação */
         function irParaEmitirOS(idSolicitacao) {
@@ -532,46 +569,50 @@
         /** Formata data/hora (reutilizado) */
         function formatarDataHora(isoString) { if (!isoString) return 'N/A'; try { return new Date(isoString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch (e) { return isoString; } }
 
-        /** Exibe detalhes da SOLICITAÇÃO no modal */
-        function verSolicitacao(index) {
-            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
-            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
-            const solic = osSolicitadas[index];
-            if (!solic) return;
-            let detalhesHtml = `<h2>Detalhes da Solicitação: ${solic['id-solicitacao']}</h2>`;
-            for (const key in solic) { if (solic.hasOwnProperty(key)) { let chaveFormatada = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); let valorFormatado = solic[key]; if (key.includes('data') || key.includes('prazo')) { valorFormatado = formatarDataHora(valorFormatado); } else { valorFormatado = formatarValor(valorFormatado); } detalhesHtml += `<p><strong>${chaveFormatada}:</strong> ${valorFormatado}</p>`; } }
-            modalContentSolic.innerHTML = detalhesHtml;
-            modalSolic.style.display = "block";
-        }
-
-        /** Abre janela de impressão com detalhes da SOLICITAÇÃO */
+        /** Imprime (salva como PDF) a solicitação selecionada diretamente do Firebase */
         function imprimirSolicitacao(index) {
-            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
-            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
-            const solic = osSolicitadas[index];
-            if (!solic) return;
-            let printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Imprimir Solicitação OS - ' + solic['id-solicitacao'] + '</title>');
-            printWindow.document.write(`<style> body { font-family: sans-serif; line-height: 1.4; font-size: 10pt; margin: 20px;} h2, h3 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 1.5em; } h2 { font-size: 14pt; text-align: center;} h3 { font-size: 11pt;} p { margin: 5px 0; } strong { font-weight: bold; } </style>`);
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(`<h2>Solicitação de OS Nº ${solic['id-solicitacao']}</h2>`);
-            for (const key in solic) { if (solic.hasOwnProperty(key)) { let chaveFormatada = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); let valorFormatado = solic[key]; if (key.includes('data') || key.includes('prazo')) { valorFormatado = formatarDataHora(valorFormatado); } else { valorFormatado = formatarValor(valorFormatado); } printWindow.document.write(`<p><strong>${chaveFormatada}:</strong> ${valorFormatado}</p>`); } }
-            printWindow.document.write('</body></html>');
-            printWindow.document.close(); printWindow.focus();
-            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-            alert("Na janela de impressão, você pode escolher 'Salvar como PDF' para gerar um arquivo PDF.");
-        }
+            database.ref('solicitacoes').once('value')
+                .then(snapshot => {
+                    const solicitacoes = snapshot.val();
+                    if (!solicitacoes) {
+                        console.error("Nenhuma solicitação encontrada no Firebase.");
+                        return;
+                    }
 
-        /** Tenta compartilhar os detalhes da solicitação */
-        async function compartilharSolicitacao(index) {
-            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS_VIEW) || '[]');
-            osSolicitadas.sort((a, b) => (b['id-solicitacao'] || '').localeCompare(a['id-solicitacao'] || ''));
-            const solic = osSolicitadas[index];
-            if (!solic) return;
-            const textoCompartilhar = `Solicitação de OS: ${solic['id-solicitacao']}\nSolicitante: ${solic['solicitante']}\nData: ${formatarDataHora(solic['data-solicitacao'])}\nÁrea: ${solic['area-manutencao']}\nPrioridade: ${solic['prioridade']}\nDescrição: ${solic['descricao-solicitacao']}`;
-            if (navigator.share) {
-                try { await navigator.share({ title: `Solicitação de OS ${solic['id-solicitacao']}`, text: textoCompartilhar }); } catch (err) { if (err.name !== 'AbortError') { console.error('Erro ao compartilhar:', err); alert('Não foi possível compartilhar a solicitação.'); } }
-            } else { alert('Seu navegador não suporta compartilhamento direto. Use Imprimir/Salvar como PDF.'); }
+                    const solicitacoesArray = Object.entries(solicitacoes).map(([id, data]) => ({ id, ...data }));
+                    solicitacoesArray.sort((a, b) => b.id - a.id);
+
+                    const solic = solicitacoesArray[index];
+                    if (!solic) return;
+
+                    const osData = `
+                <h1>Detalhes da Solicitação</h1>
+                <p><strong>ID da Solicitação:</strong> ${solic.id || 'N/A'}</p>
+                <p><strong>Solicitante:</strong> ${solic.solicitante || 'N/A'}</p>
+                <p><strong>Data da Solicitação:</strong> ${formatarDataHora(solic.dataSolicitacao)}</p>
+                <p><strong>Prioridade:</strong> ${solic.prioridade || 'N/A'}</p>
+                <p><strong>Status:</strong> ${solic.status || 'N/A'}</p>
+                <p><strong>Descrição:</strong> ${solic.descricao || 'N/A'}</p>
+                <p><strong>Observações:</strong> ${solic.observacoes || 'N/A'}</p>
+                `;
+
+                    const janela = window.open('', '_blank');
+                    janela.document.write(`
+                <html>
+                    <head>
+                    <title>Solicitação ${solic.id || 'Desconhecida'}</title>
+                    </head>
+                    <body>
+                    ${osData}
+                    </body>
+                </html>
+                `);
+                    janela.document.close();
+                    janela.print();
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar solicitação do Firebase:", error);
+                });
         }
 
         // --- Inicialização da Página ---
