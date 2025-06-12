@@ -530,12 +530,9 @@
 <body>
 
     <div class="container">
-        <div class="logo-container">
-            <div class="logo-frame"></div>
-            <img src="logo.webp" alt="Logo da Empresa" class="logo-empresa-os">
-        </div>
+
         <h1>OS/APR - Ordem de Serviço / Análise Preliminar de Riscos</h1>
-        <a href="menu.html" class="botao-voltar">Voltar ao Menu</a>
+
 
         <form id="os-form">
             <input type="hidden" id="solicitacao-id-ref" name="solicitacao-id-ref">
@@ -546,7 +543,7 @@
                     <label for="tipo-os">Tipo de OS:</label>
                     <select id="tipo-os" name="tipo-os">
                         <option value="">-- Selecione --</option>
-                        <option value="Corretiva">Corretiva</option>
+                        <option value="Corretiva" selected>Corretiva</option>
                         <option value="Preditiva">Preditiva</option>
                         <option value="Preventiva">Preventiva</option>
                         <option value="Melhoria">Melhoria</option>
@@ -557,7 +554,7 @@
                     <label for="area-manutencao">Área da Manutenção:</label>
                     <select id="area-manutencao" name="area-manutencao">
                         <option value="">-- Selecione --</option>
-                        <option value="Elétrica">Elétrica</option>
+                        <option value="Elétrica" selected>Elétrica</option>
                         <option value="Mecânica">Mecânica</option>
                         <option value="Predial">Predial</option>
                         <option value="Instrumentação">Instrumentação</option>
@@ -826,50 +823,26 @@
             const agora = new Date(); agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset()); document.getElementById('data-emissao').value = agora.toISOString().slice(0, 16);
         }
 
-        /** >>> NOVO: Busca e pré-preenche dados da solicitação original <<< */
-        function preencherDadosSolicitacao(solicitacaoId) {
-            if (!solicitacaoId) return; // Sai se não houver ID
-
-            console.log("Tentando preencher dados para Solicitação ID:", solicitacaoId);
-            const osSolicitadas = JSON.parse(localStorage.getItem(STORAGE_KEY_OS_SOLICITADAS) || '[]');
-            // Encontra a solicitação pelo ID
-            const solicitacao = osSolicitadas.find(s => s['id-solicitacao'] === solicitacaoId);
-
-            if (solicitacao) {
-                console.log("Solicitação encontrada:", solicitacao);
-                // Preenche os campos do formulário da OS com os dados da solicitação
-                document.getElementById('solicitacao-id-ref').value = solicitacaoId; // Guarda a referência
-                document.getElementById('descricao-servico').value = solicitacao['descricao-solicitacao'] || '';
-                document.getElementById('area-manutencao').value = solicitacao['area-manutencao'] || '';
-
-                // Tenta pré-selecionar o solicitante (pode não existir mais na lista)
-                const solicitanteSelect = document.getElementById('solicitante-select');
-                if (solicitacao['solicitante'] && Array.from(solicitanteSelect.options).some(opt => opt.value === solicitacao['solicitante'])) {
-                    solicitanteSelect.value = solicitacao['solicitante'];
-                } else if (solicitacao['solicitante']) {
-                    console.warn(`Solicitante "${solicitacao['solicitante']}" da solicitação não encontrado na lista atual.`);
-                    // Opcional: adicionar à lista se não existir? (pode ser complexo)
-                }
-
-                // Adiciona um aviso ou informação visual que esta OS veio de uma solicitação
-                const h1Elem = document.querySelector('h1');
-                if (h1Elem) {
-                    h1Elem.insertAdjacentHTML('afterend', `<p style="text-align: center; font-style: italic; color: var(--cor-verde);">Esta OS foi iniciada a partir da Solicitação: ${solicitacaoId}</p>`);
-                }
-
-                // Outros campos poderiam ser pré-preenchidos se existissem na solicitação (localização, etc.)
-
-            } else {
-                console.warn("Solicitação com ID", solicitacaoId, "não encontrada no localStorage.");
-            }
+        // --- Função para Obter o solicitacaoId da URL ---
+        function getSolicitacaoIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('solicitacaoId');
         }
 
-        /** >>> NOVO: Lê parâmetros da URL <<< */
-        function lerParametrosURL() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const solicitacaoId = urlParams.get('solicitacaoId'); // Pega o valor do parâmetro 'solicitacaoId'
-            return solicitacaoId; // Retorna o ID encontrado (ou null)
+        // --- Função para Preencher Dados da Solicitação ---
+        function preencherDadosSolicitacao(solicitacaoId) {
+            if (!solicitacaoId) return;
+
+            database.ref(`solicitacoes/${solicitacaoId}`).once('value')
+                .then(snapshot => {
+                    const solicitacaoData = snapshot.val();
+                    if (solicitacaoData && solicitacaoData.texto) {
+                        document.getElementById('descricao-servico').value = solicitacaoData.texto;
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar dados da solicitação:", error);
+                });
         }
 
         // --- Lógica de Salvamento da OS ---
@@ -918,15 +891,12 @@
 
         // --- Inicialização da Página ---
         document.addEventListener('DOMContentLoaded', () => {
+            const solicitacaoId = getSolicitacaoIdFromURL();
+            document.getElementById('solicitacao-id-ref').value = solicitacaoId;
+            preencherDadosSolicitacao(solicitacaoId);
             setDataHoraAtualOS();
             atualizarTodosSelectsNomesOS();
             atualizarTodosSelectsItens();
-
-            // >>> NOVO: Ler ID da solicitação da URL e preencher dados <<<
-            const solicitacaoId = lerParametrosURL();
-            if (solicitacaoId) {
-                preencherDadosSolicitacao(solicitacaoId);
-            }
         });
 
     </script>

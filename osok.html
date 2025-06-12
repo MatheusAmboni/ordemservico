@@ -382,22 +382,16 @@
 
 <body>
     <div class="container">
-        <div class="logo-container">
-            <div class="logo-frame"></div>
-            <img src="logo.webp" alt="Logo da Empresa" class="logo-imagem">
-        </div>
-        <h1>OS/APR Concluídas</h1>
 
-        <div class="botoes-topo">
-            <a href="menu.html" class="botao-menu">Voltar ao Menu</a>
-            <a href="os.html" class="botao-nova-os-apr">Emitir Nova OS/APR</a>
-        </div>
+        <h1>OS Concluídas</h1>
+
+
 
         <div class="tabela-os-apr-container">
             <table class="tabela-os-apr" id="tabela-os-apr-concluidas">
                 <thead>
                     <tr>
-                        <th>Nº OS/APR</th>
+                        <th>Nº OS</th>
                         <th>Tipo</th>
                         <th>Área</th>
                         <th>Local/Equip.</th>
@@ -408,7 +402,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="7" style="text-align: center;">Carregando OS/APR Concluídas...</td>
+                        <td colspan="7" style="text-align: center;">Carregando OS Concluídas...</td>
                     </tr>
                 </tbody>
             </table>
@@ -484,61 +478,61 @@
         /** Abre o modal com os detalhes da OS/APR */
         function verOSAPR(key) {
             database.ref(`ordensServico/${key}`).once('value')
-            .then(snapshot => {
-                const os = snapshot.val();
-                if (!os) return;
+                .then(snapshot => {
+                    const os = snapshot.val();
+                    if (!os) return;
 
-                let detalhesHtml = `<h2>Detalhes da OS/APR: ${os['numero-os']}</h2>`;
-                detalhesHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`;
-                detalhesHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`;
-                detalhesHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`;
-                detalhesHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`;
-                detalhesHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`;
-                detalhesHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
-                detalhesHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`;
+                    let detalhesHtml = `<h2>Detalhes da OS/APR: ${os['numero-os']}</h2>`;
+                    detalhesHtml += `<p><strong>Tipo:</strong> ${formatarValor(os['tipo-os'])}</p>`;
+                    detalhesHtml += `<p><strong>Área:</strong> ${formatarValor(os['area-manutencao'])}</p>`;
+                    detalhesHtml += `<p><strong>Local/Equipamento:</strong> ${formatarValor(os['localizacao'])}</p>`;
+                    detalhesHtml += `<p><strong>Descrição Serviço/Problema:</strong> ${formatarValor(os['descricao-servico'])}</p>`;
+                    detalhesHtml += `<p><strong>Data Emissão:</strong> ${formatarDataHora(os['data-emissao'])}</p>`;
+                    detalhesHtml += `<p><strong>Data Término:</strong> ${formatarDataHora(os['data-termino'])}</p>`;
+                    detalhesHtml += `<p><strong>Solicitante:</strong> ${formatarValor(os['solicitante'])}</p>`;
 
-                const executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
-                detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
+                    const executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
+                    detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
 
-                detalhesHtml += `<h3>Segurança / APR</h3>`;
-                detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
-                detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
-                detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+                    detalhesHtml += `<h3>Segurança / APR</h3>`;
+                    detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
+                    detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
+                    detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
 
-                if (os['riscos'] && os['riscos'].length > 0) {
-                detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
-                os['riscos'].forEach(r => { detalhesHtml += `<li>${r}</li>`; });
-                detalhesHtml += `</ul>`;
-                }
+                    if (os['riscos'] && os['riscos'].length > 0) {
+                        detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
+                        os['riscos'].forEach(r => { detalhesHtml += `<li>${r}</li>`; });
+                        detalhesHtml += `</ul>`;
+                    }
 
-                function listarItens(titulo, itensArray) {
-                let html = '';
-                if (itensArray && itensArray.length > 0) {
-                    html += `<h3>${titulo}</h3><ul>`;
-                    itensArray.forEach(item => {
-                    html += `<li>${item.nome} (Qtd: ${item.quantidade})</li>`;
-                    });
-                    html += `</ul>`;
-                }
-                return html;
-                }
-                detalhesHtml += listarItens('EPIs Utilizados', os['epis_selecionados']);
-                detalhesHtml += listarItens('EPCs Utilizados', os['epcs_selecionados']);
-                detalhesHtml += listarItens('Ferramentas Utilizadas', os['ferramentas_selecionadas']);
-                detalhesHtml += listarItens('Materiais Utilizados', os['materiais_selecionados']);
+                    function listarItens(titulo, itensArray) {
+                        let html = '';
+                        if (itensArray && itensArray.length > 0) {
+                            html += `<h3>${titulo}</h3><ul>`;
+                            itensArray.forEach(item => {
+                                html += `<li>${item.nome} (Qtd: ${item.quantidade})</li>`;
+                            });
+                            html += `</ul>`;
+                        }
+                        return html;
+                    }
+                    detalhesHtml += listarItens('EPIs Utilizados', os['epis_selecionados']);
+                    detalhesHtml += listarItens('EPCs Utilizados', os['epcs_selecionados']);
+                    detalhesHtml += listarItens('Ferramentas Utilizadas', os['ferramentas_selecionadas']);
+                    detalhesHtml += listarItens('Materiais Utilizados', os['materiais_selecionados']);
 
-                detalhesHtml += `<h3>Observações / Conclusão</h3>`;
-                detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
+                    detalhesHtml += `<h3>Observações / Conclusão</h3>`;
+                    detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
 
-                const modalTexto = document.getElementById('detalhes-os-apr-texto');
-                modalTexto.innerHTML = detalhesHtml;
+                    const modalTexto = document.getElementById('detalhes-os-apr-texto');
+                    modalTexto.innerHTML = detalhesHtml;
 
-                const modal = document.getElementById('detalhes-os-apr-modal');
-                modal.style.display = 'block';
-            })
-            .catch(error => {
-                console.error("Erro ao carregar detalhes da OS/APR:", error);
-            });
+                    const modal = document.getElementById('detalhes-os-apr-modal');
+                    modal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar detalhes da OS/APR:", error);
+                });
         }
 
         /** Fecha o modal de detalhes da OS/APR */

@@ -329,15 +329,18 @@
 
 <body>
     <div class="container">
-        <div class="logo-container">
-            <div class="logo-frame"></div>
-            <img src="logo.webp" alt="Logo da Empresa" class="logo-imagem">
-        </div>
+
         <h1>Solicitar Ordem de Serviço</h1>
 
         <form id="solicitar-os-form">
             <h2>Detalhes da Solicitação</h2>
             <div class="form-grid">
+
+                <div class="form-group full-width">
+                    <label for="descricao-solicitacao">Descrição da Necessidade:</label>
+                    <textarea id="descricao-solicitacao" name="descricao-solicitacao"></textarea>
+                </div>
+
                 <div class="form-group">
                     <label for="data-solicitacao">Data da Solicitação:</label>
                     <input type="datetime-local" id="data-solicitacao" name="data-solicitacao" readonly>
@@ -352,6 +355,7 @@
                     <div class="feedback-nome-salvo" id="feedback-solicitante-novo"></div>
                     <select id="solicitante-select" name="solicitante">
                         <option value="">-- Selecione seu nome --</option>
+                        <option value="Djalma" selected>Djalma</option>
                     </select>
                 </div>
 
@@ -359,7 +363,7 @@
                     <label for="area-manutencao">Área da Manutenção:</label>
                     <select id="area-manutencao" name="area-manutencao">
                         <option value="">-- Selecione a Área --</option>
-                        <option value="Elétrica">Elétrica</option>
+                        <option value="Elétrica" selected>Elétrica</option>
                         <option value="Mecânica">Mecânica</option>
                         <option value="Predial">Predial</option>
                         <option value="Instrumentação">Instrumentação</option>
@@ -372,7 +376,7 @@
                     <label for="equipe-executora">Equipe Executora:</label>
                     <select id="equipe-executora" name="equipe-executora">
                         <option value="">-- Selecione a Equipe --</option>
-                        <option value="Interna">Interna</option>
+                        <option value="Interna" selected>Interna</option>
                         <option value="Terceiros">Terceiros</option>
                     </select>
                 </div>
@@ -382,7 +386,7 @@
                     <select id="prioridade" name="prioridade">
                         <option value="">-- Selecione a Prioridade --</option>
                         <option value="Baixa" data-color="baixa">Baixa</option>
-                        <option value="Media" data-color="media">Média</option>
+                        <option value="Media" selected data-color="media">Média</option>
                         <option value="Alta" data-color="alta">Alta</option>
                         <option value="Urgencia" data-color="urgencia">Urgência</option>
                     </select>
@@ -392,16 +396,20 @@
                     <label for="prazo-conclusao">Prazo Sugerido para Conclusão:</label>
                     <input type="datetime-local" id="prazo-conclusao" name="prazo-conclusao">
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const prazoConclusaoInput = document.getElementById('prazo-conclusao');
+                        const agora = new Date();
+                        agora.setDate(agora.getDate() + 1); // Adiciona 1 dia
+                        agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+                        prazoConclusaoInput.value = agora.toISOString().slice(0, 16);
+                    });
+                </script>
 
-                <div class="form-group full-width">
-                    <label for="descricao-solicitacao">Descrição da Necessidade:</label>
-                    <textarea id="descricao-solicitacao" name="descricao-solicitacao"
-                        placeholder="Descreva o problema ou a necessidade de serviço..." rows="5"></textarea>
-                </div>
+
             </div>
 
             <div class="botoes-acao">
-                <a href="menu.html" class="botao-voltar">Voltar ao Menu</a>
                 <button type="submit" class="botao-salvar-solicitacao">Salvar Solicitação</button>
             </div>
         </form>
@@ -445,7 +453,7 @@
                 areaManutencao: document.getElementById('area-manutencao').value,
                 equipeExecutora: document.getElementById('equipe-executora').value,
                 prioridade: document.getElementById('prioridade').value,
-                prazoConclusao: document.getElementById('prazo-conclusao').value,
+                prazoConclusao: document.getElementById('prazo-conclusao').value, // Added prazoConclusao
                 descricao: document.getElementById('descricao-solicitacao').value,
                 dataSolicitacao: document.getElementById('data-solicitacao').value,
                 status: 'Solicitada'
@@ -461,6 +469,7 @@
                     alert('Solicitação de Ordem de Serviço gerada com sucesso!');
                     document.getElementById('solicitar-os-form').reset();
                     setDataHoraSolicitacao(); // Atualiza a data/hora após reset
+                    window.location.href = 'home.html'; // Redireciona para home.html
                 })
                 .catch((error) => {
                     console.error("Erro ao gerar solicitação de ordem de serviço:", error);
@@ -534,6 +543,14 @@
             const selectPrioridade = document.getElementById('prioridade');
             selectPrioridade.addEventListener('change', atualizarCorPrioridade);
             atualizarCorPrioridade(); // Define a cor inicial (se houver valor pré-selecionado)
+
+            // Captura a tecla "Enter" para submeter o formulário
+            document.getElementById('solicitar-os-form').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Evita comportamento padrão
+                    this.dispatchEvent(new Event('submit')); // Dispara o evento de submit
+                }
+            });
         });
 
     </script>

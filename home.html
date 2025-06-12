@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OS Solicitadas</title>
+    <title>Ordens abertas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         /* Estilos base (cores, container, etc.) - similares aos outros arquivos */
         :root {
@@ -219,18 +220,23 @@
             background-color: var(--cor-prioridade-urgencia);
         }
 
-        /* Botões de Ação na Tabela */
+        /* Botões de Ação na Tabela - Melhorados */
         .tabela-solicitacoes td .acoes button {
             color: var(--cor-branco);
             border: none;
-            padding: 0.5rem 0.9rem;
+            padding: 0.5rem 1rem;
             font-size: 0.85rem;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
             margin-right: 0.4rem;
-            transition: background-color 0.3s ease;
-            display: inline-block;
-            margin-bottom: 0.3rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tabela-solicitacoes td .acoes button i {
+            font-size: 1rem;
         }
 
         .tabela-solicitacoes td .acoes button.ver {
@@ -239,24 +245,25 @@
 
         .tabela-solicitacoes td .acoes button.ver:hover {
             background-color: var(--cor-laranja-hover);
+            transform: translateY(-2px);
         }
 
-        /* Botão Fazer */
         .tabela-solicitacoes td .acoes button.fazer {
             background-color: var(--cor-fazer);
         }
 
         .tabela-solicitacoes td .acoes button.fazer:hover {
             background-color: var(--cor-fazer-hover);
+            transform: translateY(-2px);
         }
 
-        /* --- */
         .tabela-solicitacoes td .acoes button.imprimir {
             background-color: var(--cor-azul-imprimir);
         }
 
         .tabela-solicitacoes td .acoes button.imprimir:hover {
             background-color: var(--cor-azul-imprimir-hover);
+            transform: translateY(-2px);
         }
 
         .tabela-solicitacoes td .acoes button.compartilhar {
@@ -265,6 +272,16 @@
 
         .tabela-solicitacoes td .acoes button.compartilhar:hover {
             background-color: var(--cor-compartilhar-hover);
+            transform: translateY(-2px);
+        }
+
+        .tabela-solicitacoes td .acoes button.remover {
+            background-color: #dc3545;
+        }
+
+        .tabela-solicitacoes td .acoes button.remover:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
         }
 
         /* Modal (similar ao osok.html) */
@@ -396,35 +413,36 @@
 
 <body>
     <div class="container">
-        <div class="logo-container">
-            <div class="logo-frame"></div>
-            <img src="logo.webp" alt="Logo da Empresa" class="logo-imagem">
-        </div>
-        <h1>Ordens de Serviço Solicitadas</h1>
 
-        <div class="botoes-topo">
-            <a href="menu.html" class="botao-menu">Voltar ao Menu</a>
-            <a href="solicitaros.html" class="botao-nova-solicitacao">Nova Solicitação</a>
-        </div>
+        <h1>Ordens abertas</h1>
 
         <div class="tabela-solicitacoes-container">
             <table class="tabela-solicitacoes" id="tabela-os-solicitadas">
                 <thead>
                     <tr>
-                        <th>Código</th>
-                        <th>Solicitante</th>
-                        <th>Data Solicitação</th>
+                        <th>Descrição</th>
+                        <th>Prazo</th>
                         <th>Prioridade</th>
-                        <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="6" style="text-align: center;">Carregando Solicitações...</td>
+                        <td colspan="5" style="text-align: center;">Carregando Solicitações...</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="botoes-topo"
+            style="text-align: center; margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <button class="botao-nova-solicitacao" onclick="window.location.href='solicitaros.html'"
+                style="width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                +
+            </button>
+            <button class="botao-menu" onclick="window.location.href='osok.html'" style="width: auto;">
+                Concluídas
+            </button>
         </div>
     </div>
 
@@ -480,12 +498,12 @@
                         return;
                     }
 
-                    const solicitacoesArray = Object.entries(solicitacoes).map(([id, data]) => ({ id, ...data }));
+                    const solicitacoesArray = Object.entries(solicitacoes).map(([key, data]) => ({ key, ...data }));
                     solicitacoesArray.sort((a, b) => b.id - a.id);
 
                     solicitacoesArray.forEach((solicitacao, index) => {
                         const row = tabelaBody.insertRow();
-                        let dataSolicFormatada = formatarDataHora(solicitacao.dataSolicitacao);
+                        let dataSolicFormatada = formatarDataHora(solicitacao.prazoConclusao);
                         let prioridadeClasse = '';
                         let prioridadeTexto = solicitacao.prioridade || 'N/A';
                         switch (prioridadeTexto.toLowerCase()) {
@@ -496,15 +514,19 @@
                         }
 
                         row.innerHTML = `
-                            <td>${solicitacao.id || 'N/A'}</td>
-                            <td>${solicitacao.solicitante || 'N/A'}</td>
+                            <td>${solicitacao.descricao || 'N/A'}</td>
                             <td>${dataSolicFormatada}</td>
                             <td class="prioridade-cell ${prioridadeClasse}">${prioridadeTexto}</td>
-                            <td>${solicitacao.status || 'Solicitada'}</td>
                             <td class="acoes">
-                                <button class="ver" onclick="verSolicitacao(${index})">Ver</button>
-                                <button class="fazer" onclick="irParaEmitirOS('${solicitacao.id}')">Fazer</button>
-                                <button class="imprimir" onclick="imprimirSolicitacao(${index})">Imprimir</button>
+                                <button class="fazer" onclick="irParaEmitirOS('${solicitacao.key}')">
+                                    <i class="fas fa-check-circle"></i> Fazer
+                                </button>
+                                <button class="imprimir" onclick="imprimirSolicitacao(${index})">
+                                    <i class="fas fa-print"></i> Imprimir
+                                </button>
+                                <button class="remover" onclick="removerSolicitacao('${solicitacao.key}')">
+                                    <i class="fas fa-trash-alt"></i> Remover
+                                </button>
                             </td>
                         `;
                     });
@@ -514,42 +536,6 @@
                     tabelaBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Erro ao carregar solicitações.</td></tr>';
                 });
         }
-
-        /** Abre o modal com os detalhes da solicitação */
-        function verSolicitacao(index) {
-            database.ref('solicitacoes').once('value')
-                .then(snapshot => {
-                    const solicitacoes = snapshot.val();
-                    if (!solicitacoes) {
-                        console.error("Nenhuma solicitação encontrada no Firebase.");
-                        return;
-                    }
-
-                    const solicitacoesArray = Object.entries(solicitacoes).map(([id, data]) => ({ id, ...data }));
-                    solicitacoesArray.sort((a, b) => b.id - a.id);
-
-                    const solic = solicitacoesArray[index];
-                    if (!solic) return;
-
-                    const detalhes = `
-                <h2>Detalhes da Solicitação</h2>
-                <p><strong>ID da Solicitação:</strong> ${solic.id || 'N/A'}</p>
-                <p><strong>Solicitante:</strong> ${solic.solicitante || 'N/A'}</p>
-                <p><strong>Data da Solicitação:</strong> ${formatarDataHora(solic.dataSolicitacao)}</p>
-                <p><strong>Prioridade:</strong> ${solic.prioridade || 'N/A'}</p>
-                <p><strong>Status:</strong> ${solic.status || 'N/A'}</p>
-                <p><strong>Descrição:</strong> ${solic.descricao || 'N/A'}</p>
-                <p><strong>Observações:</strong> ${solic.observacoes || 'N/A'}</p>
-                `;
-
-                    modalContentSolic.innerHTML = detalhes;
-                    modalSolic.style.display = "block";
-                })
-                .catch(error => {
-                    console.error("Erro ao carregar solicitação do Firebase:", error);
-                });
-        }
-
 
         /** Redireciona para a página de emissão de OS, passando o ID da solicitação */
         function irParaEmitirOS(idSolicitacao) {
@@ -589,7 +575,7 @@
                 <h1>Detalhes da Solicitação</h1>
                 <p><strong>ID da Solicitação:</strong> ${solic.id || 'N/A'}</p>
                 <p><strong>Solicitante:</strong> ${solic.solicitante || 'N/A'}</p>
-                <p><strong>Data da Solicitação:</strong> ${formatarDataHora(solic.dataSolicitacao)}</p>
+                <p><strong>Data da Solicitação:</strong> ${formatarDataHora(solic.prazoConclusao)}</p>
                 <p><strong>Prioridade:</strong> ${solic.prioridade || 'N/A'}</p>
                 <p><strong>Status:</strong> ${solic.status || 'N/A'}</p>
                 <p><strong>Descrição:</strong> ${solic.descricao || 'N/A'}</p>
@@ -613,6 +599,28 @@
                 .catch(error => {
                     console.error("Erro ao carregar solicitação do Firebase:", error);
                 });
+        }
+
+        /** Remove uma solicitação do Firebase */
+        function removerSolicitacao(idSolicitacao) {
+            if (!idSolicitacao) {
+                console.error("ID da Solicitação não fornecido para removerSolicitacao");
+                alert("Erro: Não foi possível identificar a solicitação para remover.");
+                return;
+            }
+
+            if (confirm("Tem certeza de que deseja remover esta solicitação?")) {
+                console.log(`Tentando remover solicitação com ID: ${idSolicitacao}`); // Debugging log
+                database.ref(`solicitacoes/${idSolicitacao}`).remove()
+                    .then(() => {
+                        console.log(`Solicitação com ID ${idSolicitacao} removida.`); // Debugging log
+                        carregarOSSolicitadas(); // Recarrega a lista
+                    })
+                    .catch(error => {
+                        console.error("Erro ao remover solicitação do Firebase:", error);
+                        alert("Erro ao remover a solicitação. Tente novamente.");
+                    });
+            }
         }
 
         // --- Inicialização da Página ---
