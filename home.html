@@ -423,6 +423,7 @@
                         <th>Descrição</th>
                         <th>Prazo</th>
                         <th>Prioridade</th>
+                        <th>Setor</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -517,6 +518,7 @@
                             <td>${solicitacao.descricao || 'N/A'}</td>
                             <td>${dataSolicFormatada}</td>
                             <td class="prioridade-cell ${prioridadeClasse}">${prioridadeTexto}</td>
+                            <td>${formatarValor(solicitacao.areaManutencao)}</td>
                             <td class="acoes">
                                 <button class="fazer" onclick="irParaEmitirOS('${solicitacao.key}')">
                                     <i class="fas fa-check-circle"></i> Fazer
