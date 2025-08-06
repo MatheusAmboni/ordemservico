@@ -495,9 +495,7 @@
                     detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
 
                     detalhesHtml += `<h3>Segurança / APR</h3>`;
-                    detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
-                    detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
-                    detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+                    detalhesHtml += `<p><strong>Concorda com a Apr:</strong> ${formatarValor(os['concorda-apr'])}</p>`;
 
                     if (os['riscos'] && os['riscos'].length > 0) {
                         detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
@@ -561,9 +559,7 @@
                     detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
 
                     detalhesHtml += `<h3>Segurança / APR</h3>`;
-                    detalhesHtml += `<p><strong>Trabalho a Quente:</strong> ${formatarValor(os['trabalho-quente'])}</p>`;
-                    detalhesHtml += `<p><strong>APR Necessária:</strong> ${formatarValor(os['apr-necessaria'])}</p>`;
-                    detalhesHtml += `<p><strong>Inspeção Prévia:</strong> ${formatarValor(os['inspecao-previa'])}</p>`;
+                    detalhesHtml += `<p><strong>Concorda com a Apr:</strong> ${formatarValor(os['concorda-apr'])}</p>`;
 
                     if (os['riscos'] && os['riscos'].length > 0) {
                         detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
@@ -633,7 +629,7 @@
                         dataTermino: formatarDataHora(os['data-termino']),
                         solicitante: os['solicitante'] || 'N/A',
                         executantes: [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', '),
-                        trabalhoQuente: os['trabalho-quente'] || 'N/A',
+                        concordaapr: os['concorda-apr'] || 'N/A',
                         aprNecessaria: os['apr-necessaria'] || 'N/A',
                         inspecaoPrevia: os['inspecao-previa'] || 'N/A',
                         riscos: os['riscos'] || [],
