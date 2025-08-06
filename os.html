@@ -690,56 +690,6 @@
                 </div>
                 <ul class="lista-itens-selecionados" id="lista-epis-selecionados"></ul>
             </div>
-            <div class="form-group full-width item-management-container">
-                <h3>EPCs</h3>
-                <div class="input-salvar-item-grupo"> <input type="text" id="epc-novo"
-                        placeholder="Digitar novo EPC para salvar na lista"> <button type="button"
-                        onclick="salvarNovoItemOS('epc-novo', 'epcsCadastrados', 'epc-select')">Salvar EPC</button>
-                </div>
-                <div class="feedback-nome-salvo" id="feedback-epc-novo"></div>
-                <div class="item-add-section">
-                    <div class="form-group"> <label for="epc-select">Selecionar EPC:</label> <select id="epc-select">
-                            <option value="">-- Escolha um EPC da lista --</option>
-                        </select> </div> <button type="button"
-                        onclick="adicionarItemSelecionado('epc-select', 'lista-epcs-selecionados', 'epcs')">Adicionar
-                        EPC à OS</button>
-                </div>
-                <ul class="lista-itens-selecionados" id="lista-epcs-selecionados"></ul>
-            </div>
-            <div class="form-group full-width item-management-container">
-                <h3>Ferramentas</h3>
-                <div class="input-salvar-item-grupo"> <input type="text" id="ferramenta-novo"
-                        placeholder="Digitar nova ferramenta"> <button type="button"
-                        onclick="salvarNovoItemOS('ferramenta-novo', 'ferramentasCadastradas', 'ferramenta-select')">Salvar
-                        Ferramenta</button> </div>
-                <div class="feedback-nome-salvo" id="feedback-ferramenta-novo"></div>
-                <div class="item-add-section">
-                    <div class="form-group"> <label for="ferramenta-select">Selecionar Ferramenta:</label> <select
-                            id="ferramenta-select">
-                            <option value="">-- Escolha uma ferramenta --</option>
-                        </select> </div> <button type="button"
-                        onclick="adicionarItemSelecionado('ferramenta-select', 'lista-ferramentas-selecionados', 'ferramentas')">Adicionar
-                        Ferramenta à OS</button>
-                </div>
-                <ul class="lista-itens-selecionados" id="lista-ferramentas-selecionados"></ul>
-            </div>
-            <div class="form-group full-width item-management-container">
-                <h3>Materiais Utilizados</h3>
-                <div class="input-salvar-item-grupo"> <input type="text" id="material-novo"
-                        placeholder="Digitar novo material"> <button type="button"
-                        onclick="salvarNovoItemOS('material-novo', 'materiaisCadastrados', 'material-select')">Salvar
-                        Material</button> </div>
-                <div class="feedback-nome-salvo" id="feedback-material-novo"></div>
-                <div class="item-add-section">
-                    <div class="form-group"> <label for="material-select">Selecionar Material:</label> <select
-                            id="material-select">
-                            <option value="">-- Escolha um material --</option>
-                        </select> </div> <button type="button"
-                        onclick="adicionarItemSelecionado('material-select', 'lista-materiais-selecionados', 'materiais')">Adicionar
-                        Material à OS</button>
-                </div>
-                <ul class="lista-itens-selecionados" id="lista-materiais-selecionados"></ul>
-            </div>
 
             <h2>Observações / Conclusão</h2>
             <div class="form-group full-width">
@@ -758,9 +708,6 @@
         // --- Constantes Globais ---
         const STORAGE_KEY_NOMES_OS = 'nomesCadastradosOS';
         const STORAGE_KEY_EPIS = 'episCadastrados';
-        const STORAGE_KEY_EPCS = 'epcsCadastrados';
-        const STORAGE_KEY_FERRAMENTAS = 'ferramentasCadastradas';
-        const STORAGE_KEY_MATERIAIS = 'materiaisCadastrados';
         const STORAGE_KEY_OS_SOLICITADAS = 'osSolicitadas'; // Para buscar dados da solicitação
         const STORAGE_KEY_OS_CONCLUIDAS = 'osConcluidas';   // Onde a OS final será salva
         const STORAGE_KEY_OS_COUNTER = 'osCounter';
@@ -863,9 +810,6 @@
             // Adiciona os itens selecionados (EPIs, etc.)
             const itensColetados = getItensSelecionados();
             osData['epis_selecionados'] = itensColetados.epis;
-            osData['epcs_selecionados'] = itensColetados.epcs;
-            osData['ferramentas_selecionadas'] = itensColetados.ferramentas;
-            osData['materiais_selecionados'] = itensColetados.materiais;
 
             // Define data/hora de término
             const agoraTermino = new Date();
