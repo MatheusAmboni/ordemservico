@@ -630,15 +630,98 @@
             </div>
 
             <h2>Segurança / APR</h2>
-            <div class="form-group checklist-item-yn">
-                <span>Funcionário está ciente e de acordo com a APR apresentada?</span>
+
+
+            <div class="checklist-item-yn">
+                <span>Para tarefas que envolvem trabalho em altura em espaço externo foi observado as condições
+                    climáticas como ausência de chuva, granizo, neve, velocidade do vento confirmado que está abaixo
+                    de 30km/h para realizar a atividade com segurança?</span>
                 <div class="radio-options">
-                    <label><input type="radio" name="concorda-apr" value="Sim"> Sim</label>
-                    <label><input type="radio" name="concorda-apr" value="Não"> Não</label>
+                    <label><input type="radio" name="risco-altura-clima" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-altura-clima" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-altura-clima" value="NA" required> N/A</label>
                 </div>
             </div>
 
-            <!-- <h2>Segurança / APR</h2>
+            <div class="checklist-item-yn">
+                <span>Todos envolvidos na tarefa estão cientes dos riscos de trabalho em altura e providenciaram os
+                    EPIS e EPCS necessários para realizar a atividade com segurança, aplicando técnicas de prevenção
+                    utilizando escadas amarradas, linha de vida, cinto paraquedista com talabarte duplo em Y clipado
+                    no trava quedas preso a linha de vida ou guarda corpos ou escadas, estando o tempo todo clipado
+                    em um ponto de ancoragem por um ou mais talabartes de segurança?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-altura-epis" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-altura-epis" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-altura-epis" value="NA" required> N/A</label>
+                </div>
+            </div>
+
+            <div class="checklist-item-yn">
+                <span>Todos envolvidos na tarefa estão cientes de possíveis riscos envolvendo eletricidade e
+                    providenciaram os EPIS e EPCS necessários para realizar a atividade com segurança, aplicando
+                    técnicas de prevenção utilizando a desenergização dos equipamentos em manutenção fazendo a
+                    desenergização, impedimento de energização, bloqueio, seccionamento, aterramento temporário,
+                    multiteste com aparelho voltímetro, amperímetro, detector de tensão e detector de corrente, e se
+                    detectar fazer os passos anteriores até desenergizar por completo o equipamento em
+                    manutenção?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-eletricidade" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-eletricidade" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-eletricidade" value="NA" required> N/A</label>
+                </div>
+            </div>
+
+            <div class="checklist-item-yn">
+                <span>Todos envolvidos na tarefa possuem capacitação, habilitação e foram orientados a fazer as
+                    atividades com segurança?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-capacitacao" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-capacitacao" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-capacitacao" value="NA" required> N/A</label>
+                </div>
+            </div>
+
+            <div class="checklist-item-yn">
+                <span>Todos envolvidos na tarefa possuem aptidão para a atividade conforme exames e atestado médico
+                    em dia?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-aptidao" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-aptidao" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-aptidao" value="NA" required> N/A</label>
+                </div>
+            </div>
+
+            <div class="checklist-item-yn">
+                <span>Atividades envolvendo serviços a quente e/ou soldas, foi observado e providenciaram os EPIS e
+                    EPCS necessários para realizar a atividade com segurança, aplicando técnicas de prevenção
+                    utilizando os EPIS para altas temperaturas, mascaras, óculos, luvas, aventais, assim como EPC
+                    como exaustão e ventilação, sinalização, como também foi observado e retirado do local todo e
+                    qualquer material inflamável ou explosivo?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-servico-quente" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-servico-quente" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-servico-quente" value="NA" required> N/A</label>
+                </div>
+            </div>
+
+            <div class="checklist-item-yn">
+                <span>Todos envolvidos na tarefa analisaram as condições e os riscos de cada etapa da tarefa e
+                    estão cientes de possíveis riscos e providenciaram o uso dos EPIS (calçados de proteção,
+                    aventais, protetor facial, luvas, creme de proteção para as mãos, respirador, cinto paraquedista
+                    com talabarte duplo em Y clipado a trava quedas fixado em linhas de vida, óculos de proteção
+                    incolor, óculos de proteção escuros com filtros UVA/UVB, creme de proteção solar com filtros
+                    UVA/UVB fator 30 FPS ou superior, mascara de solda, capacete com jugular, e demais EPIS
+                    relacionados aos riscos inerentes da atividade) e farão as atividades utilizando os EPIS para
+                    neutralizar os possíveis riscos da atividade?</span>
+                <div class="radio-options">
+                    <label><input type="radio" name="risco-epis-geral" value="Sim" required> Sim</label>
+                    <label><input type="radio" name="risco-epis-geral" value="Não" required> Não</label>
+                    <label><input type="radio" name="risco-epis-geral" value="NA" required> N/A</label>
+                </div>
+            </div>
+    </div>
+
+    <!-- <h2>Segurança / APR</h2>
             <div class="form-grid">
                 <div class="form-group checklist-item-yn">
                     <span>Trabalho a Quente?</span>
@@ -682,35 +765,35 @@
             </div> -->
 
 
-            <h2>Recursos Necessários / Utilizados</h2>
-            <div class="form-group full-width item-management-container">
-                <h3>EPIs</h3>
-                <div class="input-salvar-item-grupo"> <input type="text" id="epi-novo"
-                        placeholder="Digitar novo EPI para salvar na lista"> <button type="button"
-                        onclick="salvarNovoItemOS('epi-novo', 'episCadastrados', 'epi-select')">Salvar EPI</button>
-                </div>
-                <div class="feedback-nome-salvo" id="feedback-epi-novo"></div>
-                <div class="item-add-section">
-                    <div class="form-group"> <label for="epi-select">Selecionar EPI:</label> <select id="epi-select">
-                            <option value="">-- Escolha um EPI da lista --</option>
-                        </select> </div> <button type="button"
-                        onclick="adicionarItemSelecionado('epi-select', 'lista-epis-selecionados', 'epis')">Adicionar
-                        EPI à OS</button>
-                </div>
-                <ul class="lista-itens-selecionados" id="lista-epis-selecionados"></ul>
-            </div>
+    <h2>Recursos Necessários / Utilizados</h2>
+    <div class="form-group full-width item-management-container">
+        <h3>EPIs</h3>
+        <div class="input-salvar-item-grupo"> <input type="text" id="epi-novo"
+                placeholder="Digitar novo EPI para salvar na lista"> <button type="button"
+                onclick="salvarNovoItemOS('epi-novo', 'episCadastrados', 'epi-select')">Salvar EPI</button>
+        </div>
+        <div class="feedback-nome-salvo" id="feedback-epi-novo"></div>
+        <div class="item-add-section">
+            <div class="form-group"> <label for="epi-select">Selecionar EPI:</label> <select id="epi-select">
+                    <option value="">-- Escolha um EPI da lista --</option>
+                </select> </div> <button type="button"
+                onclick="adicionarItemSelecionado('epi-select', 'lista-epis-selecionados', 'epis')">Adicionar
+                EPI à OS</button>
+        </div>
+        <ul class="lista-itens-selecionados" id="lista-epis-selecionados"></ul>
+    </div>
 
 
 
-            <h2>Observações / Conclusão</h2>
-            <div class="form-group full-width">
-                <label for="observacoes">Observações Adicionais / Detalhes da Execução:</label>
-                <textarea id="observacoes" name="observacoes"
-                    placeholder="Descreva como o serviço foi executado, dificuldades, pontos de atenção, etc..."></textarea>
-            </div>
+    <h2>Observações / Conclusão</h2>
+    <div class="form-group full-width">
+        <label for="observacoes">Observações Adicionais / Detalhes da Execução:</label>
+        <textarea id="observacoes" name="observacoes"
+            placeholder="Descreva como o serviço foi executado, dificuldades, pontos de atenção, etc..."></textarea>
+    </div>
 
-            <button type="submit" class="botao-salvar-os">Salvar OS/APR</button>
-        </form>
+    <button type="submit" class="botao-salvar-os">Salvar OS/APR</button>
+    </form>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
