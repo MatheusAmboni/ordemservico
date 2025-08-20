@@ -518,6 +518,14 @@
 
                     detalhesHtml += `<h3>Observações / Conclusão</h3>`;
                     detalhesHtml += `<p>${formatarValor(os['observacoes'])}</p>`;
+                    detalhesHtml += `<h3>Segurança / APR (Se concorda com as perguntas)</h3>`;
+                    detalhesHtml += `<p><strong>Risco Altura (Clima):</strong> ${formatarValor(os['risco-altura-clima'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Altura (EPIs):</strong> ${formatarValor(os['risco-altura-epis'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Aptidão:</strong> ${formatarValor(os['risco-aptidao'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Capacitação:</strong> ${formatarValor(os['risco-capacitacao'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Eletricidade:</strong> ${formatarValor(os['risco-eletricidade'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco EPIs Gerais:</strong> ${formatarValor(os['risco-epis-geral'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Serviço Quente:</strong> ${formatarValor(os['risco-servico-quente'])}</p>`;
 
                     const modalTexto = document.getElementById('detalhes-os-apr-texto');
                     modalTexto.innerHTML = detalhesHtml;
@@ -555,8 +563,14 @@
                     const executantes = [os['executante1'], os['executante2'], os['executante3']].filter(e => e).join(', ');
                     detalhesHtml += `<p><strong>Executante(s):</strong> ${formatarValor(executantes)}</p>`;
 
-                    detalhesHtml += `<h3>Segurança / APR</h3>`;
-                    detalhesHtml += `<p><strong>Concorda com a Apr:</strong> ${formatarValor(os['concorda-apr'])}</p>`;
+                    detalhesHtml += `<h3>Segurança / APR (Se concorda com as perguntas)</h3>`;
+                    detalhesHtml += `<p><strong>Risco Altura (Clima):</strong> ${formatarValor(os['risco-altura-clima'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Altura (EPIs):</strong> ${formatarValor(os['risco-altura-epis'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Aptidão:</strong> ${formatarValor(os['risco-aptidao'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Capacitação:</strong> ${formatarValor(os['risco-capacitacao'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Eletricidade:</strong> ${formatarValor(os['risco-eletricidade'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco EPIs Gerais:</strong> ${formatarValor(os['risco-epis-geral'])}</p>`;
+                    detalhesHtml += `<p><strong>Risco Serviço Quente:</strong> ${formatarValor(os['risco-servico-quente'])}</p>`;
 
                     if (os['riscos'] && os['riscos'].length > 0) {
                         detalhesHtml += `<p><strong>Riscos Identificados:</strong></p><ul>`;
